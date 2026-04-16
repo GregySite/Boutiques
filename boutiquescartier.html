@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Maison Cartier - Global Monitor</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <script src="//unpkg.com/three"></script>
+    <script src="//unpkg.com/globe.gl"></script>
+    
+    <style>
+        /* --- DESIGN SYSTEM --- */
+        :root {
+            --cartier-red: #7d1d26;
+            --cartier-bg: #ffffff;
+            --text-main: #111111;
+            --text-light: #767676;
+            --border-color: #e5e5e5;
+            --font-serif: 'Playfair Display', serif; 
+            --font-sans: 'Lato', sans-serif;
+        }
+
+        html, body { 
+            margin: 0; padding: 0; 
+            width: 100%; height: 100%; 
+            background-color: var(--cartier-bg); 
+            font-family: var(--font-sans); 
+            color: var(--text-main);
+            overflow: hidden; 
+            display: flex; 
+        }
+
+        /* --- SIDEBAR --- */
+        #sidebar {
+            width: 360px;
+            min-width: 360px;
+            background: #fff;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+            height: 100vh;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.03);
+        }
+
+        .header {
+            padding: 30px 20px 20px;
+            background: #fff;
+            text-align: center;
+            border-bottom: 3px solid var(--cartier-red);
+        }
+        
+        #logo-img {
+            display: block; margin: 0 auto;
+            max-width: 160px; height: auto;
+        }
+        
+        .subtitle {
+            font-family: var(--font-serif);
+            font-style: italic;
+            color: var(--cartier-red);
+            font-size: 1.1em;
+            margin-top: 15px;
+            letter-spacing: 1px;
+        }
+
+        #list-container {
+            flex: 1;
+            overflow-y: auto;
+            background: #fff;
+            position: relative;
+            scroll-behavior: smooth;
+        }
+        #list-container::-webkit-scrollbar { width: 4px; }
+        #list-container::-webkit-scrollbar-thumb { background: #ccc; border-radius:2px; }
+
+        /* ITEM LISTE */
+        .shop-item {
+            padding: 18px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .shop-item:hover { background: #fafafa; padding-left: 28px; }
+        .shop-item.active { background: #fffbfb; border-left: 4px solid var(--cartier-red); padding-left: 24px; }
+        .shop-item.active .si-timer { color: var(--cartier-red); font-weight: 600; }
+
+        .si-info { display: flex; flex-direction: column; }
+        .si-country { font-size: 0.7em; color: #999; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1.5px; }
+        .si-name { font-family: var(--font-serif); font-size: 1.2em; color: #000; }
+        .si-status { text-align: right; }
+        .si-time { font-family: var(--font-sans); font-weight: 300; font-size: 1.2em; color: #333; margin-bottom: 2px; }
+        .si-timer { font-size: 0.75em; color: #aaa; margin-bottom: 6px; font-style: italic; font-family: var(--font-serif); }
+        
+        .badge {
+            display: inline-block; padding: 4px 8px; border-radius: 0;
+            font-size: 0.65em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            border: 1px solid transparent;
+        }
+        .b-open { color: var(--cartier-red); border: 1px solid var(--cartier-red); background: #fff; }
+        .b-closed { color: #1e8e3e; background: #f4fbf6; border: 1px solid #d4edda; }
+
+        /* --- GLOBE AREA --- */
+        #globe-area {
+            flex-grow: 1;
+            position: relative;
+            background: #ffffff; /* FOND BLANC */
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #utc-clock {
+            position: absolute; top: 30px; right: 30px;
+            color: #333; font-family: var(--font-serif); font-size: 1.5em; 
+            z-index: 50; background: rgba(255,255,255,0.95);
+            padding: 12px 25px; border: 1px solid #ddd;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        #loading-msg {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: #aaa; font-family: var(--font-sans); pointer-events: none; letter-spacing: 2px;
+        }
+
+        #copyright {
+            position: absolute; bottom: 15px; right: 20px;
+            color: #aaa; font-size: 0.7em; pointer-events: none; z-index: 50;
+            font-family: var(--font-sans); letter-spacing: 1px;
+        }
+
+        /* --- TOOLTIP PREMIUM --- */
+        #custom-tooltip {
+            position: absolute;
+            display: none;
+            background: #fff;
+            border-left: 3px solid var(--cartier-red);
+            padding: 15px 20px;
+            pointer-events: none;
+            z-index: 100;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            font-family: var(--font-sans);
+            min-width: 150px;
+        }
+        #custom-tooltip h3 {
+            margin: 0 0 5px 0;
+            font-family: var(--font-serif);
+            font-size: 1.1em;
+            color: #000;
+        }
+        #custom-tooltip .tt-meta { font-size: 0.8em; color: #888; text-transform: uppercase; margin-bottom: 8px; }
+        #custom-tooltip .tt-status { font-weight: bold; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div class="header">
+            <img id="logo-img" src="https://www.lynx-solarci.com/assets/images/5-1-1206x1206.webp" alt="Cartier Logo" />
+            <div class="subtitle">Disponibilité Internationale</div>
+        </div>
+        <div id="list-container"></div>
+    </div>
+
+    <div id="globe-area">
+        <div id="utc-clock">00:00 UTC</div>
+        <div id="loading-msg">Chargement Globe...</div>
+        
+        <div id="custom-tooltip"></div>
+        
+        <div id="globeViz"></div>
+        <div id="copyright">&copy; Greg u.</div>
+    </div>
+
+<script>
+    // --- 1. DONNÉES ---
+    const rawShops = [
+        // EUROPE OUEST
+        { id: 1, name: "Paris - Champs-Élysées", country: "France", tz: "Europe/Paris", lat: 48.8698, lng: 2.3075, open: 11, close: 19, daysOff: [0] },
+        { id: 2, name: "Paris - Rue de la Paix", country: "France", tz: "Europe/Paris", lat: 48.8675, lng: 2.3294, open: 10.5, close: 19, daysOff: [0] },
+        { id: 3, name: "Paris - Fbg St Honoré", country: "France", tz: "Europe/Paris", lat: 48.8700, lng: 2.3180, open: 10.5, close: 19, daysOff: [0] },
+        { id: 4, name: "Cannes - Croisette", country: "France", tz: "Europe/Paris", lat: 43.5513, lng: 7.0128, open: 10.5, close: 19, daysOff: [0] },
+        { id: 5, name: "Nice - Place Masséna", country: "France", tz: "Europe/Paris", lat: 43.6960, lng: 7.2700, open: 10.5, close: 19, daysOff: [0] },
+        { id: 6, name: "Monte-Carlo", country: "Monaco", tz: "Europe/Paris", lat: 43.7390, lng: 7.4260, open: 10, close: 19, daysOff: [0] },
+        { id: 7, name: "London - New Bond St", country: "UK", tz: "Europe/London", lat: 51.5103, lng: -0.1428, open: 10, close: 18, daysOff: [0] },
+        { id: 8, name: "London - Harrods", country: "UK", tz: "Europe/London", lat: 51.4994, lng: -0.1632, open: 10, close: 21, daysOff: [] },
+        { id: 9, name: "London - Sloane St", country: "UK", tz: "Europe/London", lat: 51.4950, lng: -0.1580, open: 10, close: 18, daysOff: [0] },
+        { id: 10, name: "Genève - Rhône", country: "Suisse", tz: "Europe/Zurich", lat: 46.2040, lng: 6.1430, open: 10, close: 18.5, daysOff: [0] },
+        { id: 11, name: "Zurich - Bahnhofstr", country: "Suisse", tz: "Europe/Zurich", lat: 47.3760, lng: 8.5400, open: 10, close: 18.5, daysOff: [0] },
+        { id: 12, name: "St. Moritz - Palace", country: "Suisse", tz: "Europe/Zurich", lat: 46.4980, lng: 9.8390, open: 10, close: 19, daysOff: [] },
+        { id: 13, name: "Bruxelles - Waterloo", country: "Belgique", tz: "Europe/Brussels", lat: 50.8350, lng: 4.3630, open: 10.5, close: 18.5, daysOff: [0] },
+        { id: 14, name: "Amsterdam - PC Hooft", country: "Pays-Bas", tz: "Europe/Amsterdam", lat: 52.3600, lng: 4.8800, open: 10, close: 18, daysOff: [0] },
+
+        // EUROPE SUD
+        { id: 15, name: "Milan - Montenapoleone", country: "Italie", tz: "Europe/Rome", lat: 45.4680, lng: 9.1930, open: 10.5, close: 19, daysOff: [0] },
+        { id: 16, name: "Rome - Via Condotti", country: "Italie", tz: "Europe/Rome", lat: 41.9050, lng: 12.4820, open: 10.5, close: 19, daysOff: [0] },
+        { id: 17, name: "Florence - Tornabuoni", country: "Italie", tz: "Europe/Rome", lat: 43.7710, lng: 11.2520, open: 10.5, close: 19, daysOff: [0] },
+        { id: 18, name: "Venise - San Marco", country: "Italie", tz: "Europe/Rome", lat: 45.4340, lng: 12.3380, open: 10.5, close: 19, daysOff: [0] },
+        { id: 19, name: "Madrid - Serrano", country: "Espagne", tz: "Europe/Madrid", lat: 40.4250, lng: -3.6870, open: 10.5, close: 20, daysOff: [0] },
+        { id: 20, name: "Barcelone - Gràcia", country: "Espagne", tz: "Europe/Madrid", lat: 41.3920, lng: 2.1640, open: 10.5, close: 20, daysOff: [0] },
+        { id: 21, name: "Lisbonne - Liberdade", country: "Portugal", tz: "Europe/Lisbon", lat: 38.7220, lng: -9.1450, open: 10.5, close: 19.5, daysOff: [0] },
+        { id: 22, name: "Munich - Maximilian", country: "Allemagne", tz: "Europe/Berlin", lat: 48.1390, lng: 11.5800, open: 10, close: 19, daysOff: [0] },
+        { id: 23, name: "Berlin - Kurfürstendamm", country: "Allemagne", tz: "Europe/Berlin", lat: 52.5010, lng: 13.3250, open: 10, close: 19, daysOff: [0] },
+        { id: 24, name: "Francfort - Goethestr", country: "Allemagne", tz: "Europe/Berlin", lat: 50.1130, lng: 8.6770, open: 10, close: 19, daysOff: [0] },
+        { id: 25, name: "Vienne - Kohlmarkt", country: "Autriche", tz: "Europe/Vienna", lat: 48.2080, lng: 16.3670, open: 10, close: 19, daysOff: [0] },
+        { id: 26, name: "Prague - Parizska", country: "Rep. Tchèque", tz: "Europe/Prague", lat: 50.0890, lng: 14.4180, open: 10, close: 19, daysOff: [0] },
+        { id: 27, name: "Istanbul - Istinye", country: "Turquie", tz: "Europe/Istanbul", lat: 41.1100, lng: 29.0550, open: 10, close: 22, daysOff: [] },
+
+        // USA EST
+        { id: 30, name: "NY - 5th Ave", country: "USA (Est)", tz: "America/New_York", lat: 40.7600, lng: -73.9750, open: 10, close: 18, daysOff: [0] },
+        { id: 31, name: "NY - Hudson Yards", country: "USA (Est)", tz: "America/New_York", lat: 40.7540, lng: -74.0000, open: 11, close: 19, daysOff: [0] },
+        { id: 32, name: "NY - Soho", country: "USA (Est)", tz: "America/New_York", lat: 40.7230, lng: -74.0000, open: 11, close: 19, daysOff: [0] },
+        { id: 33, name: "Boston - Newbury St", country: "USA (Est)", tz: "America/New_York", lat: 42.3500, lng: -71.0800, open: 10, close: 18, daysOff: [0] },
+        { id: 34, name: "Washington DC - City", country: "USA (Est)", tz: "America/New_York", lat: 38.9000, lng: -77.0250, open: 11, close: 19, daysOff: [0] },
+        { id: 35, name: "Miami - Design Dist", country: "USA (Sud)", tz: "America/New_York", lat: 25.8130, lng: -80.1930, open: 11, close: 20, daysOff: [0] },
+        { id: 36, name: "Miami - Bal Harbour", country: "USA (Sud)", tz: "America/New_York", lat: 25.8890, lng: -80.1230, open: 11, close: 21, daysOff: [] },
+        { id: 37, name: "Toronto - Bloor St", country: "Canada", tz: "America/Toronto", lat: 43.6700, lng: -79.3900, open: 11, close: 18, daysOff: [0] },
+        { id: 38, name: "Montreal - Montagne", country: "Canada", tz: "America/Toronto", lat: 45.4980, lng: -73.5750, open: 11, close: 18, daysOff: [0] },
+
+        // USA OUEST / CENTRE
+        { id: 40, name: "Chicago - Michigan", country: "USA (Cen)", tz: "America/Chicago", lat: 41.8900, lng: -87.6240, open: 10, close: 18, daysOff: [0] },
+        { id: 41, name: "Dallas - Highland", country: "USA (Cen)", tz: "America/Chicago", lat: 32.8350, lng: -96.8050, open: 10, close: 18, daysOff: [0] },
+        { id: 42, name: "Houston - River Oaks", country: "USA (Cen)", tz: "America/Chicago", lat: 29.7430, lng: -95.4200, open: 11, close: 19, daysOff: [0] },
+        { id: 43, name: "Las Vegas - Wynn", country: "USA (Mtn)", tz: "America/Los_Angeles", lat: 36.1260, lng: -115.1650, open: 10, close: 23, daysOff: [] },
+        { id: 44, name: "Las Vegas - Crystals", country: "USA (Mtn)", tz: "America/Los_Angeles", lat: 36.1070, lng: -115.1760, open: 11, close: 23, daysOff: [] },
+        { id: 45, name: "Beverly Hills - Rodeo", country: "USA (Oue)", tz: "America/Los_Angeles", lat: 34.0690, lng: -118.4030, open: 10, close: 18, daysOff: [0] },
+        { id: 46, name: "SF - Post St", country: "USA (Oue)", tz: "America/Los_Angeles", lat: 37.7880, lng: -122.4070, open: 10, close: 17.5, daysOff: [0] },
+        { id: 47, name: "Vancouver - Alberni", country: "Canada", tz: "America/Vancouver", lat: 49.2800, lng: -123.1200, open: 10.5, close: 18, daysOff: [0] },
+
+        // AMÉRIQUE LATINE
+        { id: 50, name: "Mexico - Masaryk", country: "Mexique", tz: "America/Mexico_City", lat: 19.4300, lng: -99.1900, open: 11, close: 20, daysOff: [0] },
+        { id: 51, name: "Cancun - Fashion", country: "Mexique", tz: "America/Cancun", lat: 21.1600, lng: -86.8200, open: 11, close: 22, daysOff: [] },
+        { id: 52, name: "Sao Paulo - Iguatemi", country: "Brésil", tz: "America/Sao_Paulo", lat: -23.5800, lng: -46.6800, open: 10, close: 22, daysOff: [0] },
+        { id: 53, name: "St Barth - Gustavia", country: "St Barth", tz: "America/Port_of_Spain", lat: 17.8960, lng: -62.8500, open: 10, close: 19, daysOff: [0] },
+
+        // ASIE JAPON/CORÉE
+        { id: 60, name: "Tokyo - Ginza", country: "Japon", tz: "Asia/Tokyo", lat: 35.6700, lng: 139.7600, open: 11, close: 19, daysOff: [] },
+        { id: 61, name: "Tokyo - Roppongi", country: "Japon", tz: "Asia/Tokyo", lat: 35.6600, lng: 139.7300, open: 11, close: 20, daysOff: [] },
+        { id: 62, name: "Osaka - Shinsaibashi", country: "Japon", tz: "Asia/Tokyo", lat: 34.6700, lng: 135.5000, open: 11, close: 20, daysOff: [] },
+        { id: 63, name: "Kyoto - Takashimaya", country: "Japon", tz: "Asia/Tokyo", lat: 35.0000, lng: 135.7600, open: 10, close: 20, daysOff: [] },
+        { id: 64, name: "Seoul - Cheongdam", country: "Corée", tz: "Asia/Seoul", lat: 37.5200, lng: 127.0400, open: 11, close: 20, daysOff: [] },
+        { id: 65, name: "Seoul - Gangnam", country: "Corée", tz: "Asia/Seoul", lat: 37.5000, lng: 127.0200, open: 10.5, close: 20, daysOff: [] },
+
+        // ASIE CHINE
+        { id: 70, name: "Shanghai - Bund", country: "Chine", tz: "Asia/Shanghai", lat: 31.2300, lng: 121.4900, open: 10, close: 22, daysOff: [] },
+        { id: 71, name: "Shanghai - Plaza 66", country: "Chine", tz: "Asia/Shanghai", lat: 31.2200, lng: 121.4500, open: 10, close: 22, daysOff: [] },
+        { id: 72, name: "Beijing - China World", country: "Chine", tz: "Asia/Shanghai", lat: 39.9000, lng: 116.4500, open: 10, close: 21.5, daysOff: [] },
+        { id: 73, name: "Chengdu - Taikoo Li", country: "Chine", tz: "Asia/Shanghai", lat: 30.6500, lng: 104.0800, open: 10, close: 22, daysOff: [] },
+        { id: 74, name: "HK - Peking Road", country: "Hong Kong", tz: "Asia/Hong_Kong", lat: 22.2900, lng: 114.1700, open: 10, close: 20, daysOff: [] },
+        { id: 75, name: "HK - Prince's Bldg", country: "Hong Kong", tz: "Asia/Hong_Kong", lat: 22.2800, lng: 114.1500, open: 10, close: 19, daysOff: [] },
+        { id: 76, name: "Macao - Wynn Palace", country: "Macao", tz: "Asia/Macau", lat: 22.1900, lng: 113.5400, open: 10, close: 24, daysOff: [] },
+        { id: 77, name: "Taipei - 101 Mall", country: "Taiwan", tz: "Asia/Taipei", lat: 25.0330, lng: 121.5650, open: 11, close: 21.5, daysOff: [] },
+
+        // ASIE SUD EST
+        { id: 80, name: "Singapore - ION", country: "Singapour", tz: "Asia/Singapore", lat: 1.3040, lng: 103.8320, open: 10, close: 21.5, daysOff: [] },
+        { id: 81, name: "Singapore - Marina", country: "Singapour", tz: "Asia/Singapore", lat: 1.2830, lng: 103.8580, open: 10.5, close: 23, daysOff: [] },
+        { id: 82, name: "Bangkok - Paragon", country: "Thaïlande", tz: "Asia/Bangkok", lat: 13.7460, lng: 100.5340, open: 11, close: 20, daysOff: [] },
+        { id: 83, name: "Bangkok - Iconsiam", country: "Thaïlande", tz: "Asia/Bangkok", lat: 13.7260, lng: 100.5100, open: 11, close: 21, daysOff: [] },
+        { id: 84, name: "Hanoi - Trang Tien", country: "Vietnam", tz: "Asia/Bangkok", lat: 21.0250, lng: 105.8500, open: 9.5, close: 20, daysOff: [] },
+        { id: 85, name: "Kuala Lumpur - KLCC", country: "Malaisie", tz: "Asia/Kuala_Lumpur", lat: 3.1570, lng: 101.7100, open: 10, close: 22, daysOff: [] },
+        { id: 86, name: "Jakarta - Plaza", country: "Indonésie", tz: "Asia/Jakarta", lat: -6.1900, lng: 106.8200, open: 10, close: 21, daysOff: [] },
+        { id: 87, name: "Mumbai - Jio World", country: "Inde", tz: "Asia/Kolkata", lat: 19.0700, lng: 72.8700, open: 11, close: 21, daysOff: [] },
+        { id: 88, name: "New Delhi - Emporio", country: "Inde", tz: "Asia/Kolkata", lat: 28.5400, lng: 77.1500, open: 11, close: 20, daysOff: [] },
+
+        // MOYEN ORIENT
+        { id: 90, name: "Dubai - Dubai Mall", country: "EAU", tz: "Asia/Dubai", lat: 25.1970, lng: 55.2790, open: 10, close: 23, daysOff: [] },
+        { id: 91, name: "Dubai - Emirates", country: "EAU", tz: "Asia/Dubai", lat: 25.1180, lng: 55.2000, open: 10, close: 22, daysOff: [] },
+        { id: 92, name: "Abu Dhabi - Galleria", country: "EAU", tz: "Asia/Dubai", lat: 24.5000, lng: 54.3800, open: 10, close: 22, daysOff: [] },
+        { id: 93, name: "Riyadh - Centria", country: "Arabie S.", tz: "Asia/Riyadh", lat: 24.7000, lng: 46.6800, open: 10, close: 22.5, daysOff: [5] },
+        { id: 94, name: "Jeddah - Boulevard", country: "Arabie S.", tz: "Asia/Riyadh", lat: 21.5800, lng: 39.1600, open: 10, close: 22, daysOff: [5] },
+        { id: 95, name: "Doha - Place Vendôme", country: "Qatar", tz: "Asia/Qatar", lat: 25.4000, lng: 51.5000, open: 10, close: 22, daysOff: [] },
+        { id: 96, name: "Kuwait - Avenues", country: "Koweït", tz: "Asia/Kuwait", lat: 29.3000, lng: 47.9000, open: 10, close: 22, daysOff: [] },
+        { id: 97, name: "Manama - Moda Mall", country: "Bahreïn", tz: "Asia/Bahrain", lat: 26.2400, lng: 50.5800, open: 10, close: 21, daysOff: [] },
+
+        // OCÉANIE
+        { id: 100, name: "Sydney - Castlereagh", country: "Australie", tz: "Australia/Sydney", lat: -33.8600, lng: 151.2100, open: 10, close: 17.5, daysOff: [] },
+        { id: 101, name: "Melbourne - Collins", country: "Australie", tz: "Australia/Melbourne", lat: -37.8100, lng: 144.9600, open: 10, close: 18, daysOff: [] },
+        { id: 102, name: "Brisbane - Edward", country: "Australie", tz: "Australia/Brisbane", lat: -27.4700, lng: 153.0200, open: 10, close: 17.5, daysOff: [] },
+    ];
+
+    // TRI GÉOGRAPHIQUE (Est -> Ouest)
+    const shops = rawShops.sort((a, b) => b.lng - a.lng);
+
+    // GESTION FÉRIÉS (Liste simplifiée JJ/MM)
+    const fixedHolidays = ["01/01", "01/05", "25/12"];
+
+    // --- 2. CALCUL DES STATUTS ---
+    function getStatus(shop) {
+        try {
+            const now = new Date();
+            const localDateString = now.toLocaleString("en-US", {timeZone: shop.tz});
+            const localDate = new Date(localDateString);
+            
+            const day = localDate.getDay(); 
+            const h = localDate.getHours() + (localDate.getMinutes() / 60);
+            
+            // Vérification jour férié
+            const dayMonth = String(localDate.getDate()).padStart(2,'0') + "/" + String(localDate.getMonth() + 1).padStart(2,'0');
+            const isHoliday = fixedHolidays.includes(dayMonth);
+
+            const isOff = shop.daysOff.includes(day) || isHoliday;
+            const isOpen = !isOff && h >= shop.open && h < shop.close;
+
+            const hh = String(localDate.getHours()).padStart(2,'0');
+            const mm = String(localDate.getMinutes()).padStart(2,'0');
+
+            // --- TIMER ---
+            let diffMinutes = 0;
+            let label = "";
+
+            if (isOpen) {
+                label = "Ferme dans";
+                diffMinutes = (shop.close - h) * 60;
+            } else {
+                label = "Ouvre dans";
+                if (!isOff && h < shop.open) {
+                    diffMinutes = (shop.open - h) * 60;
+                } else {
+                    // Recherche du prochain jour d'ouverture
+                    let daysToAdd = 1;
+                    let nextDate = new Date(localDate);
+                    nextDate.setDate(localDate.getDate() + 1);
+                    
+                    let loopLimit = 0;
+                    while (loopLimit < 14) { 
+                        let checkDay = nextDate.getDay();
+                        let checkDateStr = String(nextDate.getDate()).padStart(2,'0') + "/" + String(nextDate.getMonth()+1).padStart(2,'0');
+                        
+                        if (!shop.daysOff.includes(checkDay) && !fixedHolidays.includes(checkDateStr)) {
+                            break; 
+                        }
+                        daysToAdd++;
+                        nextDate.setDate(nextDate.getDate() + 1);
+                        loopLimit++;
+                    }
+
+                    let minutesUntilMidnight = (24 - h) * 60;
+                    let minutesFullDays = (daysToAdd - 1) * 24 * 60;
+                    let minutesFromMidnightToOpen = shop.open * 60;
+                    diffMinutes = minutesUntilMidnight + minutesFullDays + minutesFromMidnightToOpen;
+                }
+            }
+
+            const timerH = Math.floor(diffMinutes / 60); 
+            const timerM = Math.floor(diffMinutes % 60);
+            const timerString = `${timerH}h ${String(timerM).padStart(2, '0')}`;
+
+            return {
+                isOpen: isOpen,
+                text: isOpen ? "OUVERT" : "FERMÉ",
+                class: isOpen ? "b-open" : "b-closed",
+                color: isOpen ? "#7d1d26" : "#1e8e3e",
+                time: `${hh}:${mm}`,
+                timerLabel: label,
+                timerVal: timerString
+            };
+
+        } catch (e) {
+            return { isOpen: false, text: "ERR", class: "b-closed", color: "grey", time: "--:--", timerLabel: "-", timerVal: "" };
+        }
+    }
+
+    // --- 3. AFFICHAGE LISTE ---
+    function renderList() {
+        const container = document.getElementById('list-container');
+        if(!container) return;
+        container.innerHTML = "";
+        
+        shops.forEach(shop => {
+            const st = getStatus(shop);
+            const div = document.createElement('div');
+            div.className = "shop-item";
+            div.id = `item-${shop.id}`; 
+            
+            div.onclick = function() { window.activateShop(shop.id); };
+
+            div.innerHTML = `
+                <div class="si-info">
+                    <span class="si-country">${shop.country}</span>
+                    <span class="si-name">${shop.name}</span>
+                </div>
+                <div class="si-status">
+                    <div class="si-time">${st.time}</div>
+                    <div class="si-timer">${st.timerLabel} ${st.timerVal}</div>
+                    <div class="badge ${st.class}">${st.text}</div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // --- 4. ACTIVATION ---
+    window.activateShop = function(id) {
+        document.querySelectorAll('.shop-item').forEach(e => e.classList.remove('active'));
+        const el = document.getElementById(`item-${id}`);
+        if(el) {
+            el.classList.add('active');
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        if(window.myGlobe) {
+            const shop = shops.find(s => s.id === id);
+            if(shop) {
+                window.myGlobe.pointOfView({ lat: shop.lat, lng: shop.lng, altitude: 1.5 }, 1500);
+            }
+        }
+    };
+
+    // --- 5. INITIALISATION GLOBE AVEC JOUR/NUIT SUR FOND BLANC ---
+    let sunLight;
+
+    function initGlobe() {
+        const container = document.getElementById('globe-area');
+        if (!container) return;
+        
+        document.getElementById('loading-msg').style.display = 'none';
+
+        try {
+            window.myGlobe = Globe()
+                (document.getElementById('globeViz'))
+                .backgroundColor('#ffffff') // FOND BLANC
+                .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+                .showAtmosphere(true)
+                .atmosphereColor("#7d1d26")
+                .atmosphereAltitude(0.15)
+                .width(container.clientWidth)
+                .height(container.clientHeight)
+                
+                // POINTS CONFIGURATION DEMANDÉE
+                .pointsData(shops)
+                .pointLat('lat')
+                .pointLng('lng')
+                .pointColor(d => getStatus(d).color)
+                .pointAltitude(0.02) // ALTITUDE DEMANDÉE
+                .pointRadius(0.7)    // RAYON DEMANDÉ (Valeur de base)
+                .pointsMerge(false)
+                .pointLabel(null) 
+                
+                // INTERACTION
+                .onPointClick(d => window.activateShop(d.id))
+                .onPointHover((d, prevPoint) => {
+                    const tooltip = document.getElementById('custom-tooltip');
+                    const canvas = document.getElementById('globeViz');
+                    
+                    if (d) {
+                        canvas.style.cursor = 'pointer';
+                        
+                        // Contenu du tooltip
+                        const st = getStatus(d);
+                        tooltip.style.display = 'block';
+                        tooltip.innerHTML = `
+                            <div class="tt-meta">${d.country}</div>
+                            <h3>${d.name}</h3>
+                            <div class="tt-status" style="color:${st.color}">${st.text} - ${st.time}</div>
+                        `;
+                    } else {
+                        canvas.style.cursor = 'default';
+                        tooltip.style.display = 'none';
+                    }
+                });
+
+            // --- LUMIÈRE SOLAIRE (CONTRASTE FORT POUR FOND BLANC) ---
+            // On réduit l'ambient light pour que l'ombre soit visible
+            const ambient = new THREE.AmbientLight(0xffffff, 0.2); 
+            window.myGlobe.scene().add(ambient);
+
+            // Soleil directionnel puissant
+            sunLight = new THREE.DirectionalLight(0xffffff, 2.5);
+            window.myGlobe.scene().add(sunLight);
+
+            // Matériau pour recevoir les ombres
+            const globeMaterial = window.myGlobe.globeMaterial();
+            globeMaterial.color = new THREE.Color(0xffffff);
+            globeMaterial.shininess = 0.5;
+
+            // --- ROTATION INTELLIGENTE ---
+            // 1. Configuration de base
+            window.myGlobe.controls().autoRotate = true;
+            window.myGlobe.controls().autoRotateSpeed = 0.6;
+
+            // 2. Gestionnaires d'événements
+            const globeDiv = document.getElementById('globeViz'); // On cible le div du globe, pas le wrapper général
+
+            globeDiv.addEventListener('mouseenter', () => {
+                if (window.myGlobe) {
+                    window.myGlobe.controls().autoRotate = false;
+                }
+            });
+
+            globeDiv.addEventListener('mouseleave', () => {
+                if (window.myGlobe) {
+                    window.myGlobe.controls().autoRotate = true;
+                }
+            });
+
+            // Positionnement du tooltip
+            globeDiv.addEventListener('mousemove', (e) => {
+                const tooltip = document.getElementById('custom-tooltip');
+                if(tooltip.style.display === 'block') {
+                    // On prend les coordonnées relatives à la fenêtre ou au parent
+                    // Ici on utilise clientX/Y qui suit la souris
+                    tooltip.style.left = (e.clientX + 15) + 'px';
+                    tooltip.style.top = (e.clientY + 15) + 'px';
+                }
+            });
+
+            updateSunPosition();
+
+        } catch (e) {
+            console.error("Globe failed", e);
+        }
+    }
+
+    // --- 6. CALCUL POSITION SOLEIL ---
+    function updateSunPosition() {
+        if (!sunLight) return;
+        
+        const now = new Date();
+        const utcHours = now.getUTCHours();
+        const utcMinutes = now.getUTCMinutes();
+        
+        // Formule : Le soleil se déplace de 15° par heure vers l'Ouest
+        const sunLongitude = (12 - (utcHours + utcMinutes / 60)) * 15;
+        
+        const phi = (90 - 0) * (Math.PI / 180); // Latitude 0 (Equateur)
+        const theta = (sunLongitude + 180) * (Math.PI / 180); 
+        
+        const distance = 200;
+        sunLight.position.x = -distance * Math.sin(phi) * Math.cos(theta);
+        sunLight.position.y = distance * Math.cos(phi);
+        sunLight.position.z = distance * Math.sin(phi) * Math.sin(theta);
+    }
+
+    // --- 7. HORLOGE & UPDATE ---
+    function updateClock() {
+        const now = new Date();
+        const h = String(now.getUTCHours()).padStart(2, '0');
+        const m = String(now.getUTCMinutes()).padStart(2, '0');
+        const el = document.getElementById('utc-clock');
+        if(el) el.innerText = `${h}:${m} UTC`;
+        
+        updateSunPosition();
+    }
+
+    // --- 8. DÉMARRAGE ---
+    renderList();
+    updateClock();
+    setInterval(updateClock, 1000); 
+    
+    setInterval(() => {
+        renderList(); 
+        if(window.myGlobe) window.myGlobe.pointColor(window.myGlobe.pointColor()); 
+    }, 60000);
+
+    setTimeout(initGlobe, 500);
+
+    window.addEventListener('resize', () => {
+        if(window.myGlobe) {
+            const c = document.getElementById('globe-area');
+            window.myGlobe.width(c.clientWidth);
+            window.myGlobe.height(c.clientHeight);
+        }
+    });
+
+</script>
+</body>
+</html>
