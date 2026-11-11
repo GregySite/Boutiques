@@ -1,0 +1,111 @@
+/* Global Monitor - styles communs (couleurs de marque via --brand / --brand-soft / --accent) */
+:root {
+    --bg: #ffffff;
+    --text-main: #111111;
+    --text-light: #767676;
+    --border-color: #e5e5e5;
+    --closed: #9a9a9a;
+    --font-serif: 'Playfair Display', serif;
+    --font-sans: 'Lato', sans-serif;
+}
+
+html, body {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    background-color: var(--bg);
+    font-family: var(--font-sans);
+    color: var(--text-main);
+    overflow: hidden;
+    display: flex;
+}
+
+/* --- SIDEBAR --- */
+#sidebar {
+    width: 360px; min-width: 360px;
+    background: #fff;
+    border-right: 1px solid var(--border-color);
+    display: flex; flex-direction: column;
+    z-index: 20; height: 100vh;
+    box-shadow: 2px 0 15px rgba(0,0,0,0.03);
+}
+.header {
+    padding: 30px 20px 18px;
+    text-align: center;
+    border-bottom: 3px solid var(--brand);
+}
+#logo-img { display: block; margin: 0 auto; width: 170px; height: auto; }
+.subtitle {
+    font-family: var(--font-serif); font-style: italic;
+    color: var(--brand); font-size: 1.1em;
+    margin-top: 15px; letter-spacing: 1px;
+}
+#open-count {
+    margin-top: 8px; font-size: 0.72em; color: var(--text-light);
+    letter-spacing: 1.5px; text-transform: uppercase;
+}
+
+#list-container { flex: 1; overflow-y: auto; position: relative; scroll-behavior: smooth; }
+#list-container::-webkit-scrollbar { width: 4px; }
+#list-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
+.shop-item {
+    padding: 18px 24px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: all 0.3s ease;
+}
+.shop-item:hover { background: #fafafa; padding-left: 28px; }
+.shop-item.active { background: var(--brand-soft); border-left: 4px solid var(--brand); padding-left: 24px; }
+.shop-item.active .si-timer { color: var(--brand); font-weight: 600; }
+
+.si-info { display: flex; flex-direction: column; }
+.si-country { font-size: 0.7em; color: #999; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1.5px; }
+.si-name { font-family: var(--font-serif); font-size: 1.1em; color: #000; }
+.si-status { text-align: right; white-space: nowrap; padding-left: 10px; }
+.si-time { font-weight: 300; font-size: 1.2em; color: #333; margin-bottom: 2px; }
+.si-timer { font-size: 0.75em; color: #aaa; margin-bottom: 6px; font-style: italic; font-family: var(--font-serif); }
+
+.badge {
+    display: inline-block; padding: 4px 8px;
+    font-size: 0.65em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    border: 1px solid transparent;
+}
+.b-open { color: #fff; background: var(--brand); border-color: var(--brand); }
+.b-closed { color: var(--closed); background: #fff; border-color: #dcdcdc; }
+
+/* --- GLOBE --- */
+#globe-area { flex-grow: 1; position: relative; background: #fff; overflow: hidden; }
+
+#utc-clock {
+    position: absolute; top: 30px; right: 30px;
+    color: #333; font-family: var(--font-serif); font-size: 1.5em;
+    z-index: 50; background: rgba(255,255,255,0.95);
+    padding: 12px 25px; border: 1px solid #ddd;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+#loading-msg {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    color: #aaa; pointer-events: none; letter-spacing: 2px;
+}
+#legend {
+    position: absolute; bottom: 15px; left: 20px; z-index: 50;
+    font-size: 0.7em; color: #888; letter-spacing: 1px; pointer-events: none;
+}
+#legend span { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin: 0 5px 0 12px; vertical-align: -1px; }
+#copyright {
+    position: absolute; bottom: 15px; right: 20px;
+    color: #aaa; font-size: 0.7em; pointer-events: none; z-index: 50; letter-spacing: 1px;
+}
+
+#custom-tooltip {
+    position: absolute; display: none;
+    background: #fff; border-left: 3px solid var(--brand);
+    padding: 15px 20px; pointer-events: none; z-index: 100;
+    color: #333; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    min-width: 150px;
+}
+#custom-tooltip h3 { margin: 0 0 5px; font-family: var(--font-serif); font-size: 1.1em; color: #000; }
+#custom-tooltip .tt-meta { font-size: 0.8em; color: #888; text-transform: uppercase; margin-bottom: 8px; }
+#custom-tooltip .tt-status { font-weight: bold; font-size: 0.85em; }
+#custom-tooltip .tt-hours { font-size: 0.78em; color: #777; margin-top: 4px; }
