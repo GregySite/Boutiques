@@ -191,11 +191,60 @@
         }
 
         // --- SOLEIL (jour / nuit) ---
+        let sunUniform = null;
         function updateSun() {
             if (!globe || !sunLight) return;
             const s = sunPosition(new Date());
             const c = globe.getCoords(s.lat, s.lng, 100);
             sunLight.position.set(c.x, c.y, c.z);
+            if (sunUniform) sunUniform.value.set(c.x, c.y, c.z);
+        }
+
+        // --- LUMIÈRES DES VILLES sur la face nuit ---
+        // On greffe la texture de nuit dans le matériau du globe : elle apparaît
+        // progressivement de l'autre côté de la ligne jour/nuit.
+        function addCityLights() {
+            const mat = globe.globeMaterial();
+            if (!mat || !sunLight) return;
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                // Les classes three.js ne sont pas exposées par globe.gl : on attend la texture
+                // de jour pour réutiliser son constructeur (même instance de three.js).
+                const waitForDayMap = () => {
+                    if (!mat.map) { setTimeout(waitForDayMap, 200); return; }
+                    const nightTex = new mat.map.constructor(img);
+                    nightTex.colorSpace = mat.map.colorSpace;
+                    nightTex.needsUpdate = true;
+                    sunUniform = { value: sunLight.position.clone() };
+                    mat.onBeforeCompile = shader => {
+                        shader.uniforms.nightMap = { value: nightTex };
+                        shader.uniforms.sunDir = sunUniform;
+                        shader.vertexShader = shader.vertexShader
+                            .replace('#include <common>', '#include <common>\nvarying vec3 vWorldN;')
+                            .replace('#include <beginnormal_vertex>',
+                                '#include <beginnormal_vertex>\nvWorldN = normalize(mat3(modelMatrix) * objectNormal);');
+                        shader.fragmentShader = shader.fragmentShader
+                            .replace('#include <common>',
+                                '#include <common>\nuniform sampler2D nightMap;\nuniform vec3 sunDir;\nvarying vec3 vWorldN;')
+                            .replace('#include <dithering_fragment>', [
+                                '#include <dithering_fragment>',
+                                'float sunDot = dot(normalize(vWorldN), normalize(sunDir));',
+                                'float night = 1.0 - smoothstep(-0.12, 0.12, sunDot);',
+                                'vec3 nTex = texture2D(nightMap, vMapUv).rgb;',
+                                // fond de nuit bleuté + lumières des villes renforcées (les zones claires ressortent)
+                                'float city = max(nTex.r - nTex.b * 0.7, 0.0);',
+                                'vec3 nightCol = gl_FragColor.rgb * ' + (cfg.nightDim || 0.3).toFixed(2) +
+                                    ' + nTex * 1.1 + vec3(1.0, 0.82, 0.55) * city * ' + (cfg.cityLights || 7).toFixed(2) + ';',
+                                'gl_FragColor.rgb = mix(gl_FragColor.rgb, nightCol, night);'
+                            ].join('\n'));
+                    };
+                    mat.needsUpdate = true;
+                    updateSun();
+                };
+                waitForDayMap();
+            };
+            img.src = 'https://unpkg.com/three-globe@2.45.6/example/img/earth-night.jpg';
         }
 
         // --- GLOBE ---
@@ -258,6 +307,7 @@
                 const mat = globe.globeMaterial();
                 if (mat) mat.shininess = 4;
                 updateSun();
+                addCityLights();
 
                 // Rotation auto, en pause quand la souris est sur le globe
                 const controls = globe.controls();
