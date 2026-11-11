@@ -253,7 +253,7 @@
                 const lights = globe.lights();
                 const ambient = lights.find(l => l.isAmbientLight);
                 sunLight = lights.find(l => l.isDirectionalLight);
-                if (ambient) ambient.intensity = 0.9;
+                if (ambient) ambient.intensity = cfg.ambientIntensity || 0.9; // éclairage de la face nuit
                 if (sunLight) sunLight.intensity = 3.2;
                 const mat = globe.globeMaterial();
                 if (mat) mat.shininess = 4;
