@@ -233,9 +233,9 @@
                                 'float night = 1.0 - smoothstep(-0.12, 0.12, sunDot);',
                                 'vec3 nTex = texture2D(nightMap, vMapUv).rgb;',
                                 // fond de nuit bleuté + lumières des villes renforcées (les zones claires ressortent)
-                                'float city = max(nTex.r - nTex.b * 0.7, 0.0);',
-                                'vec3 nightCol = gl_FragColor.rgb * ' + (cfg.nightDim || 0.3).toFixed(2) +
-                                    ' + nTex * 1.1 + vec3(1.0, 0.82, 0.55) * city * ' + (cfg.cityLights || 7).toFixed(2) + ';',
+                                'float city = max(nTex.r - nTex.b * 0.5, 0.0);',
+                                'vec3 nightCol = gl_FragColor.rgb * ' + (cfg.nightDim || 0.8).toFixed(2) +
+                                    ' + nTex * 1.4 + vec3(1.0, 0.85, 0.6) * city * ' + (cfg.cityLights || 20).toFixed(2) + ';',
                                 'gl_FragColor.rgb = mix(gl_FragColor.rgb, nightCol, night);'
                             ].join('\n'));
                     };
