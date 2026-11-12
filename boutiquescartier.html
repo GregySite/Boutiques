@@ -68,11 +68,16 @@ const SHOPS = [
     ["Vienne - Kohlmarkt", "Autriche", "AT", "Europe/Vienna", 48.2093, 16.3685, "- 1030-1900*5 1030-1800"],
     ["Prague - Vieille Ville", "Rép. tchèque", "CZ", "Europe/Prague", 50.0882, 14.4211, "1200-1800 1030-1900*5 1030-1800"],
     ["Istanbul - Istinye Park", "Turquie", "TR", "Europe/Istanbul", 41.1104, 29.0334, "1000-2200*7"],
+    ["Stockholm - Smålandsgatan", "Suède", "SE", "Europe/Stockholm", 59.3338, 18.0739, "- 1000-1800*5 1000-1700"],
+    ["Athènes - Voukourestiou", "Grèce", "GR", "Europe/Athens", 37.9772, 23.7352, "- 1000-1800 1000-2000 1000-1800 1000-2000 1000-2000 1000-1800"],
+    ["Bordeaux - Cours de l'Intendance", "France", "FR", "Europe/Paris", 44.8419, -0.5788, "- 1400-1900 1030-1900*5"],
+    ["Bakou - Rue du 28 Mai", "Azerbaïdjan", "AZ", "Asia/Baku", 40.3751, 49.8437, "1130-1830 1030-1930*6"],
+    ["Almaty - Samal 2", "Kazakhstan", "KZ", "Asia/Almaty", 43.2308, 76.9503, "1100-1800 1100-2000*6"],
 
     // AMÉRIQUE DU NORD
-    ["NY - 5th Avenue Mansion", "USA (Est)", "US", "America/New_York", 40.7596, -73.9760, "1200-1800 1000-1900*6"],
-    ["NY - Hudson Yards", "USA (Est)", "US", "America/New_York", 40.7538, -74.0014, "1100-1900 1000-2000*6"],
-    ["NY - SoHo", "USA (Est)", "US", "America/New_York", 40.7243, -73.9997, "1200-1800 1100-1900*6"],
+    ["New York - 5th Avenue Mansion", "USA (Est)", "US", "America/New_York", 40.7596, -73.9760, "1200-1800 1000-1900*6"],
+    ["New York - Hudson Yards", "USA (Est)", "US", "America/New_York", 40.7538, -74.0014, "1100-1900 1000-2000*6"],
+    ["New York - SoHo", "USA (Est)", "US", "America/New_York", 40.7243, -73.9997, "1200-1800 1100-1900*6"],
     ["Boston - Newbury St", "USA (Est)", "US", "America/New_York", 42.3521, -71.0725, "1200-1700 1000-1800*6"],
     ["Washington - Tysons Galleria", "USA (Est)", "US", "America/New_York", 38.9243, -77.2248, "1200-1800 1100-1900*6"],
     ["Miami - Design District", "USA (Est)", "US", "America/New_York", 25.8130, -80.1925, "1200-1800 1100-2000*6"],
@@ -86,12 +91,23 @@ const SHOPS = [
     ["Beverly Hills - Rodeo Dr", "USA (Ouest)", "US", "America/Los_Angeles", 34.0694, -118.4034, "1100-1700 1000-1800*5 1000-1900"],
     ["San Francisco - Post St", "USA (Ouest)", "US", "America/Los_Angeles", 37.7885, -122.4054, "1100-1800 1000-1800*6"],
     ["Vancouver - Burrard St", "Canada", "CA", "America/Vancouver", 49.2839, -123.1219, "1100-1800 1000-1800*6"],
+    ["Atlanta - Phipps Plaza", "USA (Est)", "US", "America/New_York", 33.8526, -84.3632, "1200-1700 1000-1800*4 1000-1900*2"],
+    ["Scottsdale - Fashion Square", "USA (Ouest)", "US", "America/Phoenix", 33.5035, -111.9316, "1100-1700 1100-1900*5 1100-2000"],
+    ["Honolulu - Ala Moana", "USA (Hawaï)", "US", "Pacific/Honolulu", 21.2912, -157.8443, "1000-2000*7"],
 
     // AMÉRIQUE LATINE / CARAÏBES
     ["Mexico - Polanco", "Mexique", "MX", "America/Mexico_City", 19.4325, -99.2015, "1200-1800 1100-1900*6"],
     ["Cancún - La Isla", "Mexique", "MX", "America/Cancun", 21.1122, -86.7622, "1100-2100*7"],
     ["São Paulo - Iguatemi", "Brésil", "BR", "America/Sao_Paulo", -23.5769, -46.6879, "1400-1930 1000-2130*6"],
     ["St Barth - Gustavia", "St Barth", "BL", "America/St_Barthelemy", 17.8983, -62.8498, "- 1000-1230,1530-1900*6"],
+    ["Monterrey - Del Valle", "Mexique", "MX", "America/Monterrey", 25.6513, -100.3596, "1100-2100*7"],
+    ["Guadalajara - Andares", "Mexique", "MX", "America/Mexico_City", 20.7116, -103.4116, "1100-2100*7"],
+    ["Panama - Multiplaza", "Panama", "PA", "America/Panama", 8.9847, -79.5123, "1100-1900 1000-2000*6"],
+    ["Bogotá - Calle 84A", "Colombie", "CO", "America/Bogota", 4.6675, -74.0526, "- 1030-1900*5 1130-1800"],
+    ["Grand Cayman - Bayshore Mall", "Îles Caïmans", "KY", "America/Cayman", 19.2937, -81.3833, "- 0900-1700*6"],
+    ["Saint-Domingue - Blue Mall", "Rép. dominicaine", "DO", "America/Santo_Domingo", 18.4684, -69.9394, "1100-2000 1000-2100*6"],
+    ["Aruba - Oranjestad", "Aruba", "AW", "America/Aruba", 12.5191, -70.0382, "- 1000-1900*6"],
+    ["Barbade - Holetown", "Barbade", "BB", "America/Barbados", 13.1865, -59.6364, "- 1000-1800*6"],
 
     // ASIE - JAPON / CORÉE
     ["Tokyo - Ginza Namiki-dori", "Japon", "JP", "Asia/Tokyo", 35.6712, 139.7635, "1100-1900*7"],
@@ -100,6 +116,8 @@ const SHOPS = [
     ["Kyoto - Takashimaya", "Japon", "JP", "Asia/Tokyo", 35.0035, 135.7686, "1030-2000*7"],
     ["Séoul - Maison Cheongdam", "Corée", "KR", "Asia/Seoul", 37.5270, 127.0449, "1100-1930*7"],
     ["Séoul - Shinsegae Gangnam", "Corée", "KR", "Asia/Seoul", 37.5053, 127.0042, "1030-2030 1030-2000*4 1030-2030*2"],
+    ["Sapporo - Daimaru", "Japon", "JP", "Asia/Tokyo", 43.0677, 141.3495, "1000-2000*7"],
+    ["Fukuoka - Iwataya", "Japon", "JP", "Asia/Tokyo", 33.5894, 130.3975, "1000-2000*7"],
 
     // ASIE - CHINE / HK / MACAO / TAÏWAN
     ["Shanghai - Lujiazui", "Chine", "CN", "Asia/Shanghai", 31.2371, 121.5021, "1000-2200*7"],
@@ -110,6 +128,14 @@ const SHOPS = [
     ["HK - Landmark Prince's", "Hong Kong", "HK", "Asia/Hong_Kong", 22.2815, 114.1591, "1100-1800 1030-1900*6"],
     ["Macao - One Central", "Macao", "MO", "Asia/Macau", 22.1856, 113.5465, "1030-2230*5 1030-2300*2"],
     ["Taipei - Taipei 101", "Taïwan", "TW", "Asia/Taipei", 25.0336, 121.5641, "1100-2130*5 1100-2200*2"],
+    ["Harbin", "Chine", "CN", "Asia/Shanghai", 45.7580, 126.6053, "1000-2100*7"],
+    ["Shenyang", "Chine", "CN", "Asia/Shanghai", 41.7754, 123.4348, "1000-2200*7"],
+    ["Qingdao", "Chine", "CN", "Asia/Shanghai", 36.0605, 120.3953, "1000-2130*5 1000-2200*2"],
+    ["Zhengzhou", "Chine", "CN", "Asia/Shanghai", 34.7575, 113.6664, "1000-2200*7"],
+    ["Xi'an", "Chine", "CN", "Asia/Shanghai", 34.2474, 108.9488, "1000-2200*7"],
+    ["Wuhan", "Chine", "CN", "Asia/Shanghai", 30.5808, 114.2710, "0900-2130 0930-2130*4 0930-2200*2"],
+    ["Kunming", "Chine", "CN", "Asia/Shanghai", 25.0373, 102.7213, "1000-2200*5 1000-2230*2"],
+    ["Sanya - Duty Free City", "Chine", "CN", "Asia/Shanghai", 18.3742, 109.7508, "1000-2200*7"],
 
     // ASIE DU SUD-EST / INDE
     ["Singapour - ION Orchard", "Singapour", "SG", "Asia/Singapore", 1.3041, 103.8317, "1000-2130*7"],
@@ -121,6 +147,8 @@ const SHOPS = [
     ["Jakarta - Plaza Indonesia", "Indonésie", "ID", "Asia/Jakarta", -6.1932, 106.8220, "1000-2000*7"],
     ["Mumbai - Jio World", "Inde", "IN", "Asia/Kolkata", 19.0656, 72.8668, "1100-2200*7"],
     ["New Delhi - Emporio", "Inde", "IN", "Asia/Kolkata", 28.5434, 77.1568, "1100-2100*7"],
+    ["Manille - Greenbelt 3", "Philippines", "PH", "Asia/Manila", 14.5516, 121.0224, "1100-2000*5 1100-2100*2"],
+    ["Hô Chi Minh-Ville - Union Square", "Vietnam", "VN", "Asia/Ho_Chi_Minh", 10.7762, 106.7018, "1000-2100*7"],
 
     // MOYEN-ORIENT
     ["Dubaï - Dubai Mall", "EAU", "AE", "Asia/Dubai", 25.1985, 55.2800, "1000-0 1000-2300*4 1000-0*2"],
@@ -131,11 +159,16 @@ const SHOPS = [
     ["Doha - Place Vendôme", "Qatar", "QA", "Asia/Qatar", 25.4051, 51.5206, "1000-2300*4 1000-0 1000-1130,1300-0 1000-2300"],
     ["Koweït - Salhiya", "Koweït", "KW", "Asia/Kuwait", 29.3633, 47.9665, "1000-2200*5 1400-2200 1000-2200"],
     ["Bahreïn - Marassi Galleria", "Bahreïn", "BH", "Asia/Bahrain", 26.3017, 50.6428, "1000-2200*4 1000-0*2 1000-2200"],
+    ["Beyrouth - Aïshti by the Sea", "Liban", "LB", "Asia/Beirut", 33.9119, 35.5804, "1200-1900 1030-1930*6"],
+    ["Casablanca - Place des Nations Unies", "Maroc", "MA", "Africa/Casablanca", 33.5960, -7.6188, "- 1030-1900*6"],
+    ["Johannesburg - Sandton", "Afrique du Sud", "ZA", "Africa/Johannesburg", -26.1089, 28.0505, "0900-1700 0900-1800*6"],
 
     // OCÉANIE
     ["Sydney - Flagship", "Australie", "AU", "Australia/Sydney", -33.8684, 151.2074, "1000-1900 1000-1800*3 1000-2000 1000-1900*2"],
     ["Melbourne - Collins St", "Australie", "AU", "Australia/Melbourne", -37.8141, 144.9705, "1100-1700 1000-1800*4 1000-1900 1000-1800"],
-    ["Brisbane - Edward St", "Australie", "AU", "Australia/Brisbane", -27.4693, 153.0276, "1030-1700 1000-1800*4 1000-1900 1000-1700"]
+    ["Brisbane - Edward St", "Australie", "AU", "Australia/Brisbane", -27.4693, 153.0276, "1030-1700 1000-1800*4 1000-1900 1000-1700"],
+    ["Perth - Murray St", "Australie", "AU", "Australia/Perth", -31.9523, 115.8562, "1100-1700 1000-1800*4 1000-1900 1000-1700"],
+    ["Auckland - Queen St", "Nouvelle-Zélande", "NZ", "Pacific/Auckland", -36.8457, 174.7665, "1000-1800*7"]
 ];
 
 initMonitor({
@@ -148,7 +181,9 @@ initMonitor({
         closesIn: 'Ferme dans', opensIn: 'Ouvre dans', dayUnit: 'j',
         today: "Aujourd'hui", closedToday: "Fermé aujourd'hui",
         unknown: 'Horaires indisponibles', globeError: 'Globe indisponible',
-        openCount: (o, n) => `${o} / ${n} boutiques ouvertes`
+        openCount: (o, n) => `${o} / ${n} boutiques ouvertes`,
+        searchPlaceholder: 'Rechercher un pays, une ville, une boutique…',
+        noResults: 'Aucune boutique trouvée'
     }
 });
 </script>

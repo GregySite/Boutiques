@@ -18,7 +18,8 @@
     const EU_STD = ['01-01', '05-01', '12-25'];
     const HOLIDAYS = {
         FR: EU_STD, MC: EU_STD, BE: EU_STD, DE: EU_STD, AT: EU_STD, IT: EU_STD,
-        ES: EU_STD, PT: EU_STD, CZ: EU_STD,
+        ES: EU_STD, PT: EU_STD, CZ: EU_STD, GR: EU_STD,
+        SE: ['01-01', '12-25'], NZ: ['12-25'],
         CH: ['01-01', '12-25'], NL: ['01-01', '12-25'], GB: ['12-25'],
         US: ['12-25', 'THANKSGIVING'], CA: ['12-25'],
         MX: ['01-01', '12-25'], BR: ['01-01', '12-25'], BL: ['01-01', '12-25'],
@@ -116,6 +117,17 @@
         const $ = id => document.getElementById(id);
         const list = $('list-container');
         let activeId = null;
+        let query = '';
+
+        // Texte de recherche : nom, pays affiché, code pays, nom du pays en FR et EN, sans accents
+        const norm = str => String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        const countryNames = cc => ['fr', 'en'].map(l => {
+            try { return new Intl.DisplayNames([l], { type: 'region' }).of(cc) || ''; } catch (e) { return ''; }
+        }).join(' ');
+        shops.forEach(s => {
+            s.search = norm([s.name, s.country, s.cc, countryNames(s.cc)].join(' '));
+        });
+        const matches = s => !query || query.split(/\s+/).every(w => s.search.includes(w));
         let globe = null, sunLight = null;
 
         const fmtTimer = mins => {
@@ -130,6 +142,36 @@
                 badge: st.open ? T.open : (st.hol ? T.holiday : T.closed),
                 timer: st.mins === null ? T.unknown : `${st.open ? T.closesIn : T.opensIn} ${fmtTimer(st.mins)}`
             };
+        }
+
+        // --- RECHERCHE ---
+        const searchBox = document.createElement('input');
+        searchBox.type = 'search';
+        searchBox.id = 'search';
+        searchBox.placeholder = T.searchPlaceholder || 'Search';
+        searchBox.autocomplete = 'off';
+        document.querySelector('.header').appendChild(searchBox);
+        const noResults = document.createElement('div');
+        noResults.id = 'no-results';
+        noResults.textContent = T.noResults || 'No results';
+        list.appendChild(noResults);
+        searchBox.addEventListener('input', () => { query = norm(searchBox.value.trim()); applyFilter(); });
+        searchBox.addEventListener('keydown', e => {
+            if (e.key === 'Enter') { const first = shops.find(matches); if (first) activateShop(first.id); }
+            if (e.key === 'Escape') { searchBox.value = ''; query = ''; applyFilter(); }
+        });
+
+        function applyFilter() {
+            let n = 0;
+            shops.forEach(s => { const ok = matches(s); s.el.style.display = ok ? '' : 'none'; if (ok) n++; });
+            noResults.style.display = n ? 'none' : 'block';
+            if (globe) globe.pointsData(shops.filter(matches));
+            updateCount();
+        }
+
+        function updateCount() {
+            const visible = shops.filter(matches);
+            $('open-count').textContent = T.openCount(visible.filter(s => s.st && s.st.open).length, visible.length);
         }
 
         // --- LISTE ---
@@ -156,10 +198,8 @@
 
         function refresh() {
             const now = new Date();
-            let openCount = 0;
             shops.forEach(shop => {
                 const st = shop.st = getStatus(shop, now);
-                if (st.open) openCount++;
                 const tx = statusTexts(st);
                 shop.el.querySelector('.si-time').textContent = st.time;
                 shop.el.querySelector('.si-timer').textContent = tx.timer;
@@ -167,7 +207,7 @@
                 b.textContent = tx.badge;
                 b.className = 'badge ' + (st.open ? 'b-open' : 'b-closed');
             });
-            $('open-count').textContent = T.openCount(openCount, shops.length);
+            updateCount();
             if (globe) globe.pointColor(d => d.st.open ? cfg.brandColor : cfg.closedColor);
         }
 

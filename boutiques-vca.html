@@ -61,10 +61,14 @@ const SHOPS = [
     ["Barcelona - Paseo de Gracia", "Spain", "ES", "Europe/Madrid", 41.3940, 2.1621, "- 1100-2000*6"],
     ["Munich - Maximilianstrasse", "Germany", "DE", "Europe/Berlin", 48.1390, 11.5800, "- 1030-1830*5 1030-1800"],
     ["Frankfurt - Goethestrasse", "Germany", "DE", "Europe/Berlin", 50.1142, 8.6740, "- 1030-1830*5 1030-1800"],
+    ["Lisbon - Avenida da Liberdade", "Portugal", "PT", "Europe/Lisbon", 38.7218, -9.1462, "1100-1800 1000-1930*6"],
+    ["Istanbul - Swissotel", "Turkey", "TR", "Europe/Istanbul", 41.0409, 28.9976, "- 1000-2000*6"],
+    ["Kyiv - Olginska", "Ukraine", "UA", "Europe/Kyiv", 50.4465, 30.5277, "1100-1900*7"],
+    ["Almaty - Samal 2", "Kazakhstan", "KZ", "Asia/Almaty", 43.2310, 76.9502, "1100-1800 1100-2000*6"],
 
     // AMERICAS
-    ["NY - Fifth Avenue", "USA", "US", "America/New_York", 40.7634, -73.9741, "1200-1700 1100-1800*6"],
-    ["NY - Hudson Yards", "USA", "US", "America/New_York", 40.7536, -74.0012, "1100-1800 1000-1900*6"],
+    ["New York - Fifth Avenue", "USA", "US", "America/New_York", 40.7634, -73.9741, "1200-1700 1100-1800*6"],
+    ["New York - Hudson Yards", "USA", "US", "America/New_York", 40.7536, -74.0012, "1100-1800 1000-1900*6"],
     ["Miami - Design District", "USA", "US", "America/New_York", 25.8120, -80.1922, "1200-1800 1100-2000*6"],
     ["Miami - Bal Harbour", "USA", "US", "America/New_York", 25.8884, -80.1252, "1100-2100*7"],
     ["Beverly Hills - Rodeo Drive", "USA", "US", "America/Los_Angeles", 34.0680, -118.4015, "1200-1700 1000-1800*6"],
@@ -79,6 +83,9 @@ const SHOPS = [
     ["Vancouver - Alberni Street", "Canada", "CA", "America/Vancouver", 49.2851, -123.1228, "1100-1700 1000-1800*6"],
     ["Mexico City - Artz Pedregal", "Mexico", "MX", "America/Mexico_City", 19.3133, -99.2196, "1100-2000*7"],
     ["São Paulo - Cidade Jardim", "Brazil", "BR", "America/Sao_Paulo", -23.5981, -46.6976, "1400-1930 1000-2130*6"],
+    ["Atlanta - Neiman Marcus", "USA", "US", "America/New_York", 33.8460, -84.3640, "1200-1800 1000-2000*6"],
+    ["Aspen - East Hyman Avenue", "USA", "US", "America/Denver", 39.1892, -106.8195, "- 1100-1800*6"],
+    ["Scottsdale - Fashion Square", "USA", "US", "America/Phoenix", 33.5034, -111.9303, "1100-1800 1000-1900*6"],
 
     // ASIA - JAPAN & KOREA
     ["Tokyo - Ginza 1-chome", "Japan", "JP", "Asia/Tokyo", 35.6742, 139.7677, "1100-1900*7"],
@@ -90,6 +97,7 @@ const SHOPS = [
     ["Seoul - Galleria", "South Korea", "KR", "Asia/Seoul", 37.5279, 127.0418, "1030-2030 1030-2000*4 1030-2030*2"],
     ["Seoul - Lotte Main", "South Korea", "KR", "Asia/Seoul", 37.5647, 126.9817, "1030-2030 1030-2000*4 1030-2030*2"],
     ["Seoul - Shinsegae Gangnam", "South Korea", "KR", "Asia/Seoul", 37.5043, 127.0036, "1030-2030 1030-2000*4 1030-2030*2"],
+    ["Fukuoka - Solaria", "Japan", "JP", "Asia/Tokyo", 33.5889, 130.3992, "1000-2000*7"],
 
     // ASIA - CHINA, HK, MACAU, TAIWAN
     ["Shanghai - Plaza 66", "China", "CN", "Asia/Shanghai", 31.2279, 121.4537, "1000-2200*7"],
@@ -106,6 +114,12 @@ const SHOPS = [
     ["Macau - Galaxy", "Macau", "MO", "Asia/Macau", 22.1488, 113.5544, "1000-2200*5 1000-0*2"],
     ["Taipei - Taipei 101", "Taiwan", "TW", "Asia/Taipei", 25.0338, 121.5646, "1100-2130*5 1100-2200*2"],
     ["Taipei - Breeze Xin Yi", "Taiwan", "TW", "Asia/Taipei", 25.0406, 121.5653, "1100-2130*4 1100-2200*3"],
+    ["Harbin - Charter", "China", "CN", "Asia/Shanghai", 45.7578, 126.6056, "1000-2100*7"],
+    ["Qingdao - Hisense Plaza", "China", "CN", "Asia/Shanghai", 36.0622, 120.3779, "1000-2130*5 1000-2200*2"],
+    ["Zhengzhou - David Plaza", "China", "CN", "Asia/Shanghai", 34.7998, 113.6607, "1000-2200*7"],
+    ["Xi'an - Shin Kong Place", "China", "CN", "Asia/Shanghai", 34.2469, 108.9473, "1000-2200*7"],
+    ["Wuhan - Heartland 66", "China", "CN", "Asia/Shanghai", 30.5739, 114.2622, "1000-2200*7"],
+    ["Sanya - Haitang Bay", "China", "CN", "Asia/Shanghai", 18.3713, 109.7498, "1000-2200*7"],
 
     // ASIA - SOUTH-EAST
     ["Singapore - Marina Bay Sands", "Singapore", "SG", "Asia/Singapore", 1.2852, 103.8594, "1030-2200*5 1030-2300*2"],
@@ -113,6 +127,8 @@ const SHOPS = [
     ["Bangkok - Siam Paragon", "Thailand", "TH", "Asia/Bangkok", 13.7461, 100.5364, "1000-2030*7"],
     ["Bangkok - ICONSIAM", "Thailand", "TH", "Asia/Bangkok", 13.7265, 100.5099, "1030-2000*7"],
     ["Kuala Lumpur - Pavilion", "Malaysia", "MY", "Asia/Kuala_Lumpur", 3.1490, 101.7134, "1000-2200*7"],
+    ["Ho Chi Minh City - Union Square", "Vietnam", "VN", "Asia/Ho_Chi_Minh", 10.7763, 106.7019, "1000-2100*7"],
+    ["New Delhi - The Chanakya", "India", "IN", "Asia/Kolkata", 28.5844, 77.1907, "1100-2000*7"],
 
     // MIDDLE EAST
     ["Dubai - Dubai Mall", "UAE", "AE", "Asia/Dubai", 25.1983, 55.2801, "1000-0 1000-2300*4 1000-0*2"],
@@ -123,11 +139,13 @@ const SHOPS = [
     ["Doha - Place Vendôme", "Qatar", "QA", "Asia/Qatar", 25.4032, 51.5229, "1000-2300*4 1000-0 1300-0 1000-2300"],
     ["Kuwait City - Avenues Mall", "Kuwait", "KW", "Asia/Kuwait", 29.3021, 47.9350, "1000-2200*7"],
     ["Bahrain - Marassi Galleria", "Bahrain", "BH", "Asia/Bahrain", 26.3020, 50.6430, "1000-2200*4 1000-0*2 1000-2200"],
+    ["Jeddah - Al Khayyat Mall", "Saudi Arabia", "SA", "Asia/Riyadh", 21.5491, 39.1512, "1000-2230*5 1600-2230 1000-2230"],
 
     // OCEANIA
     ["Sydney - George Street", "Australia", "AU", "Australia/Sydney", -33.8678, 151.2067, "1100-1800 1000-1800*3 1000-1900*3"],
     ["Melbourne - Collins Street", "Australia", "AU", "Australia/Melbourne", -37.8146, 144.9705, "1100-1700 1000-1800*4 1000-1900 1000-1800"],
-    ["Perth - Murray Street", "Australia", "AU", "Australia/Perth", -31.9515, 115.8552, "1100-1700 1000-1800*4 1000-1900 1000-1700"]
+    ["Perth - Murray Street", "Australia", "AU", "Australia/Perth", -31.9515, 115.8552, "1100-1700 1000-1800*4 1000-1900 1000-1700"],
+    ["Auckland - Queen Street", "New Zealand", "NZ", "Pacific/Auckland", -36.8450, 174.7667, "1100-1700 1000-1800*6"]
 ];
 
 initMonitor({
@@ -140,7 +158,9 @@ initMonitor({
         closesIn: 'Closes in', opensIn: 'Opens in', dayUnit: 'd',
         today: 'Today', closedToday: 'Closed today',
         unknown: 'Hours unavailable', globeError: 'Globe unavailable',
-        openCount: (o, n) => `${o} / ${n} boutiques open`
+        openCount: (o, n) => `${o} / ${n} boutiques open`,
+        searchPlaceholder: 'Search a country, city or boutique…',
+        noResults: 'No boutique found'
     }
 });
 </script>

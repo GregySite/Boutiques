@@ -44,6 +44,15 @@ html, body {
     letter-spacing: 1.5px; text-transform: uppercase;
 }
 
+#search {
+    display: block; width: 100%; box-sizing: border-box;
+    margin-top: 14px; padding: 9px 12px;
+    font-family: var(--font-sans); font-size: 0.9em; color: var(--text-main);
+    border: 1px solid #ddd; border-radius: 2px; outline: none; background: #fafafa;
+}
+#search:focus { border-color: var(--brand); background: #fff; }
+#no-results { display: none; padding: 30px 24px; color: #999; font-style: italic; font-family: var(--font-serif); text-align: center; }
+
 #list-container { flex: 1; overflow-y: auto; position: relative; scroll-behavior: smooth; }
 #list-container::-webkit-scrollbar { width: 4px; }
 #list-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
