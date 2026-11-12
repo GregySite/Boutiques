@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,7 +21,7 @@
     <div id="sidebar">
         <div class="header">
             <img id="logo-img" src="logos/cartier.svg" alt="Cartier" />
-            <div class="subtitle">Disponibilité Internationale</div>
+            <div class="subtitle">Global Availability</div>
             <div id="open-count"></div>
         </div>
         <div id="list-container"></div>
@@ -29,16 +29,16 @@
 
     <div id="globe-area">
         <div id="utc-clock">00:00 UTC</div>
-        <div id="loading-msg">Chargement Globe...</div>
+        <div id="loading-msg">Loading Globe...</div>
         <div id="custom-tooltip"></div>
         <div id="globeViz"></div>
-        <div id="legend"><span style="background:#7d1d26"></span>Ouvert<span style="background:#9a9a9a"></span>Fermé</div>
+        <div id="legend"><span style="background:#7d1d26"></span>Open<span style="background:#9a9a9a"></span>Closed</div>
         <div id="copyright">&copy; Greg u.</div>
     </div>
 
 <script>
-// Horaires officiels relevés sur stores.cartier.com (novembre 2026), du dimanche au samedi.
-// Format décrit en tête de monitor.js.
+// Official opening hours from stores.cartier.com (November 2026), Sunday to Saturday.
+// Format described at the top of monitor.js.
 const SHOPS = [
     // EUROPE
     ["Paris - Champs-Élysées", "France", "FR", "Europe/Paris", 48.8735, 2.2976, "1200-1900 1100-1900*6"],
@@ -50,125 +50,125 @@ const SHOPS = [
     ["London - New Bond St", "UK", "GB", "Europe/London", 51.5097, -0.1419, "1200-1700 1000-1900*6"],
     ["London - Harrods", "UK", "GB", "Europe/London", 51.4990, -0.1637, "1130-1800 1000-2100*6"],
     ["London - Sloane St", "UK", "GB", "Europe/London", 51.4929, -0.1581, "1100-1700 1000-1800*6"],
-    ["Genève - Rue du Rhône", "Suisse", "CH", "Europe/Zurich", 46.2041, 6.1489, "- 1000-1900*5 1000-1800"],
-    ["Zurich - Bahnhofstrasse", "Suisse", "CH", "Europe/Zurich", 47.3721, 8.5382, "- 1000-1900*5 1000-1800"],
-    ["St. Moritz - Palace Galerie", "Suisse", "CH", "Europe/Zurich", 46.4973, 9.8401, "- 1000-1830*6"],
-    ["Bruxelles - Bd de Waterloo", "Belgique", "BE", "Europe/Brussels", 50.8367, 4.3562, "- 1030-1800*6"],
-    ["Amsterdam - PC Hooftstraat", "Pays-Bas", "NL", "Europe/Amsterdam", 52.3594, 4.8781, "1200-1700 1000-1830*6"],
-    ["Milan - Montenapoleone", "Italie", "IT", "Europe/Rome", 45.4690, 9.1946, "1100-1900 1000-1900*6"],
-    ["Rome - Via Condotti", "Italie", "IT", "Europe/Rome", 41.9055, 12.4814, "1100-1900 1030-1900*6"],
-    ["Florence - Via Strozzi", "Italie", "IT", "Europe/Rome", 43.7716, 11.2520, "1100-1900 1030-1900*6"],
-    ["Venise - San Moisè", "Italie", "IT", "Europe/Rome", 45.4333, 12.3362, "1100-1900 1000-1900*6"],
-    ["Madrid - Serrano", "Espagne", "ES", "Europe/Madrid", 40.4306, -3.6866, "- 1000-2030*6"],
-    ["Barcelone - Passeig de Gràcia", "Espagne", "ES", "Europe/Madrid", 41.3944, 2.1627, "- 1100-2000*6"],
-    ["Lisbonne - Av. da Liberdade", "Portugal", "PT", "Europe/Lisbon", 38.7234, -9.1477, "- 1000-1900*6"],
-    ["Munich - Maximilianstrasse", "Allemagne", "DE", "Europe/Berlin", 48.1387, 11.5817, "- 1030-1830*5 1030-1800"],
-    ["Berlin - Kurfürstendamm", "Allemagne", "DE", "Europe/Berlin", 52.5007, 13.3156, "- 1030-1830*5 1030-1800"],
-    ["Francfort - Goethestrasse", "Allemagne", "DE", "Europe/Berlin", 50.1138, 8.6748, "- 1030-1830*5 1030-1800"],
-    ["Vienne - Kohlmarkt", "Autriche", "AT", "Europe/Vienna", 48.2093, 16.3685, "- 1030-1900*5 1030-1800"],
-    ["Prague - Vieille Ville", "Rép. tchèque", "CZ", "Europe/Prague", 50.0882, 14.4211, "1200-1800 1030-1900*5 1030-1800"],
-    ["Istanbul - Istinye Park", "Turquie", "TR", "Europe/Istanbul", 41.1104, 29.0334, "1000-2200*7"],
-    ["Stockholm - Smålandsgatan", "Suède", "SE", "Europe/Stockholm", 59.3338, 18.0739, "- 1000-1800*5 1000-1700"],
-    ["Athènes - Voukourestiou", "Grèce", "GR", "Europe/Athens", 37.9772, 23.7352, "- 1000-1800 1000-2000 1000-1800 1000-2000 1000-2000 1000-1800"],
+    ["Geneva - Rue du Rhône", "Switzerland", "CH", "Europe/Zurich", 46.2041, 6.1489, "- 1000-1900*5 1000-1800"],
+    ["Zurich - Bahnhofstrasse", "Switzerland", "CH", "Europe/Zurich", 47.3721, 8.5382, "- 1000-1900*5 1000-1800"],
+    ["St. Moritz - Palace Galerie", "Switzerland", "CH", "Europe/Zurich", 46.4973, 9.8401, "- 1000-1830*6"],
+    ["Brussels - Bd de Waterloo", "Belgium", "BE", "Europe/Brussels", 50.8367, 4.3562, "- 1030-1800*6"],
+    ["Amsterdam - PC Hooftstraat", "Netherlands", "NL", "Europe/Amsterdam", 52.3594, 4.8781, "1200-1700 1000-1830*6"],
+    ["Milan - Montenapoleone", "Italy", "IT", "Europe/Rome", 45.4690, 9.1946, "1100-1900 1000-1900*6"],
+    ["Rome - Via Condotti", "Italy", "IT", "Europe/Rome", 41.9055, 12.4814, "1100-1900 1030-1900*6"],
+    ["Florence - Via Strozzi", "Italy", "IT", "Europe/Rome", 43.7716, 11.2520, "1100-1900 1030-1900*6"],
+    ["Venice - San Moisè", "Italy", "IT", "Europe/Rome", 45.4333, 12.3362, "1100-1900 1000-1900*6"],
+    ["Madrid - Serrano", "Spain", "ES", "Europe/Madrid", 40.4306, -3.6866, "- 1000-2030*6"],
+    ["Barcelona - Passeig de Gràcia", "Spain", "ES", "Europe/Madrid", 41.3944, 2.1627, "- 1100-2000*6"],
+    ["Lisbon - Av. da Liberdade", "Portugal", "PT", "Europe/Lisbon", 38.7234, -9.1477, "- 1000-1900*6"],
+    ["Munich - Maximilianstrasse", "Germany", "DE", "Europe/Berlin", 48.1387, 11.5817, "- 1030-1830*5 1030-1800"],
+    ["Berlin - Kurfürstendamm", "Germany", "DE", "Europe/Berlin", 52.5007, 13.3156, "- 1030-1830*5 1030-1800"],
+    ["Frankfurt - Goethestrasse", "Germany", "DE", "Europe/Berlin", 50.1138, 8.6748, "- 1030-1830*5 1030-1800"],
+    ["Vienna - Kohlmarkt", "Austria", "AT", "Europe/Vienna", 48.2093, 16.3685, "- 1030-1900*5 1030-1800"],
+    ["Prague - Old Town Square", "Czech Republic", "CZ", "Europe/Prague", 50.0882, 14.4211, "1200-1800 1030-1900*5 1030-1800"],
+    ["Istanbul - Istinye Park", "Turkey", "TR", "Europe/Istanbul", 41.1104, 29.0334, "1000-2200*7"],
+    ["Stockholm - Smålandsgatan", "Sweden", "SE", "Europe/Stockholm", 59.3338, 18.0739, "- 1000-1800*5 1000-1700"],
+    ["Athens - Voukourestiou", "Greece", "GR", "Europe/Athens", 37.9772, 23.7352, "- 1000-1800 1000-2000 1000-1800 1000-2000 1000-2000 1000-1800"],
     ["Bordeaux - Cours de l'Intendance", "France", "FR", "Europe/Paris", 44.8419, -0.5788, "- 1400-1900 1030-1900*5"],
-    ["Bakou - Rue du 28 Mai", "Azerbaïdjan", "AZ", "Asia/Baku", 40.3751, 49.8437, "1130-1830 1030-1930*6"],
+    ["Baku - 28 May Street", "Azerbaijan", "AZ", "Asia/Baku", 40.3751, 49.8437, "1130-1830 1030-1930*6"],
     ["Almaty - Samal 2", "Kazakhstan", "KZ", "Asia/Almaty", 43.2308, 76.9503, "1100-1800 1100-2000*6"],
 
-    // AMÉRIQUE DU NORD
-    ["New York - 5th Avenue Mansion", "USA (Est)", "US", "America/New_York", 40.7596, -73.9760, "1200-1800 1000-1900*6"],
-    ["New York - Hudson Yards", "USA (Est)", "US", "America/New_York", 40.7538, -74.0014, "1100-1900 1000-2000*6"],
-    ["New York - SoHo", "USA (Est)", "US", "America/New_York", 40.7243, -73.9997, "1200-1800 1100-1900*6"],
-    ["Boston - Newbury St", "USA (Est)", "US", "America/New_York", 42.3521, -71.0725, "1200-1700 1000-1800*6"],
-    ["Washington - Tysons Galleria", "USA (Est)", "US", "America/New_York", 38.9243, -77.2248, "1200-1800 1100-1900*6"],
-    ["Miami - Design District", "USA (Est)", "US", "America/New_York", 25.8130, -80.1925, "1200-1800 1100-2000*6"],
-    ["Miami - Aventura Mall", "USA (Est)", "US", "America/New_York", 25.9576, -80.1433, "1200-1900 1100-2000*6"],
+    // NORTH AMERICA
+    ["New York - 5th Avenue Mansion", "USA (East)", "US", "America/New_York", 40.7596, -73.9760, "1200-1800 1000-1900*6"],
+    ["New York - Hudson Yards", "USA (East)", "US", "America/New_York", 40.7538, -74.0014, "1100-1900 1000-2000*6"],
+    ["New York - SoHo", "USA (East)", "US", "America/New_York", 40.7243, -73.9997, "1200-1800 1100-1900*6"],
+    ["Boston - Newbury St", "USA (East)", "US", "America/New_York", 42.3521, -71.0725, "1200-1700 1000-1800*6"],
+    ["Washington - Tysons Galleria", "USA (East)", "US", "America/New_York", 38.9243, -77.2248, "1200-1800 1100-1900*6"],
+    ["Miami - Design District", "USA (East)", "US", "America/New_York", 25.8130, -80.1925, "1200-1800 1100-2000*6"],
+    ["Miami - Aventura Mall", "USA (East)", "US", "America/New_York", 25.9576, -80.1433, "1200-1900 1100-2000*6"],
     ["Toronto - Bloor St", "Canada", "CA", "America/Toronto", 43.6688, -79.3923, "1100-1800*4 1100-1900*2 1000-1800"],
-    ["Chicago - Michigan Ave", "USA (Centre)", "US", "America/Chicago", 41.9004, -87.6277, "1200-1800 1000-1800*6"],
-    ["Dallas - Highland Park", "USA (Centre)", "US", "America/Chicago", 32.8364, -96.8052, "1200-1700 1000-1800*6"],
-    ["Houston - River Oaks", "USA (Centre)", "US", "America/Chicago", 29.7431, -95.4530, "1200-1800 1000-1800*4 1000-1900*2"],
-    ["Las Vegas - Wynn", "USA (Ouest)", "US", "America/Los_Angeles", 36.1258, -115.1657, "1000-2100*5 1000-2200*2"],
-    ["Las Vegas - Crystals", "USA (Ouest)", "US", "America/Los_Angeles", 36.1073, -115.1736, "1100-2100*5 1000-2200*2"],
-    ["Beverly Hills - Rodeo Dr", "USA (Ouest)", "US", "America/Los_Angeles", 34.0694, -118.4034, "1100-1700 1000-1800*5 1000-1900"],
-    ["San Francisco - Post St", "USA (Ouest)", "US", "America/Los_Angeles", 37.7885, -122.4054, "1100-1800 1000-1800*6"],
+    ["Chicago - Michigan Ave", "USA (Central)", "US", "America/Chicago", 41.9004, -87.6277, "1200-1800 1000-1800*6"],
+    ["Dallas - Highland Park", "USA (Central)", "US", "America/Chicago", 32.8364, -96.8052, "1200-1700 1000-1800*6"],
+    ["Houston - River Oaks", "USA (Central)", "US", "America/Chicago", 29.7431, -95.4530, "1200-1800 1000-1800*4 1000-1900*2"],
+    ["Las Vegas - Wynn", "USA (West)", "US", "America/Los_Angeles", 36.1258, -115.1657, "1000-2100*5 1000-2200*2"],
+    ["Las Vegas - Crystals", "USA (West)", "US", "America/Los_Angeles", 36.1073, -115.1736, "1100-2100*5 1000-2200*2"],
+    ["Beverly Hills - Rodeo Dr", "USA (West)", "US", "America/Los_Angeles", 34.0694, -118.4034, "1100-1700 1000-1800*5 1000-1900"],
+    ["San Francisco - Post St", "USA (West)", "US", "America/Los_Angeles", 37.7885, -122.4054, "1100-1800 1000-1800*6"],
     ["Vancouver - Burrard St", "Canada", "CA", "America/Vancouver", 49.2839, -123.1219, "1100-1800 1000-1800*6"],
-    ["Atlanta - Phipps Plaza", "USA (Est)", "US", "America/New_York", 33.8526, -84.3632, "1200-1700 1000-1800*4 1000-1900*2"],
-    ["Scottsdale - Fashion Square", "USA (Ouest)", "US", "America/Phoenix", 33.5035, -111.9316, "1100-1700 1100-1900*5 1100-2000"],
-    ["Honolulu - Ala Moana", "USA (Hawaï)", "US", "Pacific/Honolulu", 21.2912, -157.8443, "1000-2000*7"],
+    ["Atlanta - Phipps Plaza", "USA (East)", "US", "America/New_York", 33.8526, -84.3632, "1200-1700 1000-1800*4 1000-1900*2"],
+    ["Scottsdale - Fashion Square", "USA (West)", "US", "America/Phoenix", 33.5035, -111.9316, "1100-1700 1100-1900*5 1100-2000"],
+    ["Honolulu - Ala Moana", "USA (Hawaii)", "US", "Pacific/Honolulu", 21.2912, -157.8443, "1000-2000*7"],
 
-    // AMÉRIQUE LATINE / CARAÏBES
-    ["Mexico - Polanco", "Mexique", "MX", "America/Mexico_City", 19.4325, -99.2015, "1200-1800 1100-1900*6"],
-    ["Cancún - La Isla", "Mexique", "MX", "America/Cancun", 21.1122, -86.7622, "1100-2100*7"],
-    ["São Paulo - Iguatemi", "Brésil", "BR", "America/Sao_Paulo", -23.5769, -46.6879, "1400-1930 1000-2130*6"],
-    ["St Barth - Gustavia", "St Barth", "BL", "America/St_Barthelemy", 17.8983, -62.8498, "- 1000-1230,1530-1900*6"],
-    ["Monterrey - Del Valle", "Mexique", "MX", "America/Monterrey", 25.6513, -100.3596, "1100-2100*7"],
-    ["Guadalajara - Andares", "Mexique", "MX", "America/Mexico_City", 20.7116, -103.4116, "1100-2100*7"],
+    // LATIN AMERICA / CARIBBEAN
+    ["Mexico City - Polanco", "Mexico", "MX", "America/Mexico_City", 19.4325, -99.2015, "1200-1800 1100-1900*6"],
+    ["Cancún - La Isla", "Mexico", "MX", "America/Cancun", 21.1122, -86.7622, "1100-2100*7"],
+    ["São Paulo - Iguatemi", "Brazil", "BR", "America/Sao_Paulo", -23.5769, -46.6879, "1400-1930 1000-2130*6"],
+    ["St Barths - Gustavia", "St Barths", "BL", "America/St_Barthelemy", 17.8983, -62.8498, "- 1000-1230,1530-1900*6"],
+    ["Monterrey - Del Valle", "Mexico", "MX", "America/Monterrey", 25.6513, -100.3596, "1100-2100*7"],
+    ["Guadalajara - Andares", "Mexico", "MX", "America/Mexico_City", 20.7116, -103.4116, "1100-2100*7"],
     ["Panama - Multiplaza", "Panama", "PA", "America/Panama", 8.9847, -79.5123, "1100-1900 1000-2000*6"],
-    ["Bogotá - Calle 84A", "Colombie", "CO", "America/Bogota", 4.6675, -74.0526, "- 1030-1900*5 1130-1800"],
-    ["Grand Cayman - Bayshore Mall", "Îles Caïmans", "KY", "America/Cayman", 19.2937, -81.3833, "- 0900-1700*6"],
-    ["Saint-Domingue - Blue Mall", "Rép. dominicaine", "DO", "America/Santo_Domingo", 18.4684, -69.9394, "1100-2000 1000-2100*6"],
+    ["Bogotá - Calle 84A", "Colombia", "CO", "America/Bogota", 4.6675, -74.0526, "- 1030-1900*5 1130-1800"],
+    ["Grand Cayman - Bayshore Mall", "Cayman Islands", "KY", "America/Cayman", 19.2937, -81.3833, "- 0900-1700*6"],
+    ["Santo Domingo - Blue Mall", "Dominican Republic", "DO", "America/Santo_Domingo", 18.4684, -69.9394, "1100-2000 1000-2100*6"],
     ["Aruba - Oranjestad", "Aruba", "AW", "America/Aruba", 12.5191, -70.0382, "- 1000-1900*6"],
-    ["Barbade - Holetown", "Barbade", "BB", "America/Barbados", 13.1865, -59.6364, "- 1000-1800*6"],
+    ["Barbados - Holetown", "Barbados", "BB", "America/Barbados", 13.1865, -59.6364, "- 1000-1800*6"],
 
-    // ASIE - JAPON / CORÉE
-    ["Tokyo - Ginza Namiki-dori", "Japon", "JP", "Asia/Tokyo", 35.6712, 139.7635, "1100-1900*7"],
-    ["Tokyo - Roppongi Hills", "Japon", "JP", "Asia/Tokyo", 35.6607, 139.7293, "1100-2000*7"],
-    ["Osaka - Daimaru Shinsaibashi", "Japon", "JP", "Asia/Tokyo", 34.6731, 135.5009, "1000-2000*7"],
-    ["Kyoto - Takashimaya", "Japon", "JP", "Asia/Tokyo", 35.0035, 135.7686, "1030-2000*7"],
-    ["Séoul - Maison Cheongdam", "Corée", "KR", "Asia/Seoul", 37.5270, 127.0449, "1100-1930*7"],
-    ["Séoul - Shinsegae Gangnam", "Corée", "KR", "Asia/Seoul", 37.5053, 127.0042, "1030-2030 1030-2000*4 1030-2030*2"],
-    ["Sapporo - Daimaru", "Japon", "JP", "Asia/Tokyo", 43.0677, 141.3495, "1000-2000*7"],
-    ["Fukuoka - Iwataya", "Japon", "JP", "Asia/Tokyo", 33.5894, 130.3975, "1000-2000*7"],
+    // ASIA - JAPAN & KOREA
+    ["Tokyo - Ginza Namiki-dori", "Japan", "JP", "Asia/Tokyo", 35.6712, 139.7635, "1100-1900*7"],
+    ["Tokyo - Roppongi Hills", "Japan", "JP", "Asia/Tokyo", 35.6607, 139.7293, "1100-2000*7"],
+    ["Osaka - Daimaru Shinsaibashi", "Japan", "JP", "Asia/Tokyo", 34.6731, 135.5009, "1000-2000*7"],
+    ["Kyoto - Takashimaya", "Japan", "JP", "Asia/Tokyo", 35.0035, 135.7686, "1030-2000*7"],
+    ["Seoul - Maison Cheongdam", "South Korea", "KR", "Asia/Seoul", 37.5270, 127.0449, "1100-1930*7"],
+    ["Seoul - Shinsegae Gangnam", "South Korea", "KR", "Asia/Seoul", 37.5053, 127.0042, "1030-2030 1030-2000*4 1030-2030*2"],
+    ["Sapporo - Daimaru", "Japan", "JP", "Asia/Tokyo", 43.0677, 141.3495, "1000-2000*7"],
+    ["Fukuoka - Iwataya", "Japan", "JP", "Asia/Tokyo", 33.5894, 130.3975, "1000-2000*7"],
 
-    // ASIE - CHINE / HK / MACAO / TAÏWAN
-    ["Shanghai - Lujiazui", "Chine", "CN", "Asia/Shanghai", 31.2371, 121.5021, "1000-2200*7"],
-    ["Shanghai - Plaza 66", "Chine", "CN", "Asia/Shanghai", 31.2277, 121.4545, "1000-2200*7"],
-    ["Pékin - China World", "Chine", "CN", "Asia/Shanghai", 39.9095, 116.4589, "1000-2130*7"],
-    ["Chengdu - Taikoo Li", "Chine", "CN", "Asia/Shanghai", 30.6536, 104.0824, "1000-2200*7"],
-    ["HK - Peking Road", "Hong Kong", "HK", "Asia/Hong_Kong", 22.2961, 114.1700, "1100-2100*7"],
-    ["HK - Landmark Prince's", "Hong Kong", "HK", "Asia/Hong_Kong", 22.2815, 114.1591, "1100-1800 1030-1900*6"],
-    ["Macao - One Central", "Macao", "MO", "Asia/Macau", 22.1856, 113.5465, "1030-2230*5 1030-2300*2"],
-    ["Taipei - Taipei 101", "Taïwan", "TW", "Asia/Taipei", 25.0336, 121.5641, "1100-2130*5 1100-2200*2"],
-    ["Harbin", "Chine", "CN", "Asia/Shanghai", 45.7580, 126.6053, "1000-2100*7"],
-    ["Shenyang", "Chine", "CN", "Asia/Shanghai", 41.7754, 123.4348, "1000-2200*7"],
-    ["Qingdao", "Chine", "CN", "Asia/Shanghai", 36.0605, 120.3953, "1000-2130*5 1000-2200*2"],
-    ["Zhengzhou", "Chine", "CN", "Asia/Shanghai", 34.7575, 113.6664, "1000-2200*7"],
-    ["Xi'an", "Chine", "CN", "Asia/Shanghai", 34.2474, 108.9488, "1000-2200*7"],
-    ["Wuhan", "Chine", "CN", "Asia/Shanghai", 30.5808, 114.2710, "0900-2130 0930-2130*4 0930-2200*2"],
-    ["Kunming", "Chine", "CN", "Asia/Shanghai", 25.0373, 102.7213, "1000-2200*5 1000-2230*2"],
-    ["Sanya - Duty Free City", "Chine", "CN", "Asia/Shanghai", 18.3742, 109.7508, "1000-2200*7"],
+    // ASIA - CHINA, HK, MACAU, TAIWAN
+    ["Shanghai - Lujiazui", "China", "CN", "Asia/Shanghai", 31.2371, 121.5021, "1000-2200*7"],
+    ["Shanghai - Plaza 66", "China", "CN", "Asia/Shanghai", 31.2277, 121.4545, "1000-2200*7"],
+    ["Beijing - China World", "China", "CN", "Asia/Shanghai", 39.9095, 116.4589, "1000-2130*7"],
+    ["Chengdu - Taikoo Li", "China", "CN", "Asia/Shanghai", 30.6536, 104.0824, "1000-2200*7"],
+    ["Hong Kong - Peking Road", "Hong Kong", "HK", "Asia/Hong_Kong", 22.2961, 114.1700, "1100-2100*7"],
+    ["Hong Kong - Landmark Prince's", "Hong Kong", "HK", "Asia/Hong_Kong", 22.2815, 114.1591, "1100-1800 1030-1900*6"],
+    ["Macau - One Central", "Macau", "MO", "Asia/Macau", 22.1856, 113.5465, "1030-2230*5 1030-2300*2"],
+    ["Taipei - Taipei 101", "Taiwan", "TW", "Asia/Taipei", 25.0336, 121.5641, "1100-2130*5 1100-2200*2"],
+    ["Harbin", "China", "CN", "Asia/Shanghai", 45.7580, 126.6053, "1000-2100*7"],
+    ["Shenyang", "China", "CN", "Asia/Shanghai", 41.7754, 123.4348, "1000-2200*7"],
+    ["Qingdao", "China", "CN", "Asia/Shanghai", 36.0605, 120.3953, "1000-2130*5 1000-2200*2"],
+    ["Zhengzhou", "China", "CN", "Asia/Shanghai", 34.7575, 113.6664, "1000-2200*7"],
+    ["Xi'an", "China", "CN", "Asia/Shanghai", 34.2474, 108.9488, "1000-2200*7"],
+    ["Wuhan", "China", "CN", "Asia/Shanghai", 30.5808, 114.2710, "0900-2130 0930-2130*4 0930-2200*2"],
+    ["Kunming", "China", "CN", "Asia/Shanghai", 25.0373, 102.7213, "1000-2200*5 1000-2230*2"],
+    ["Sanya - Duty Free City", "China", "CN", "Asia/Shanghai", 18.3742, 109.7508, "1000-2200*7"],
 
-    // ASIE DU SUD-EST / INDE
-    ["Singapour - ION Orchard", "Singapour", "SG", "Asia/Singapore", 1.3041, 103.8317, "1000-2130*7"],
-    ["Singapour - Marina Bay Sands", "Singapour", "SG", "Asia/Singapore", 1.2837, 103.8594, "1030-2200*5 1030-2300*2"],
-    ["Bangkok - Siam Paragon", "Thaïlande", "TH", "Asia/Bangkok", 13.7466, 100.5342, "1030-2030*7"],
-    ["Bangkok - Iconsiam", "Thaïlande", "TH", "Asia/Bangkok", 13.7264, 100.5100, "1030-2000*7"],
-    ["Hanoï - Tràng Tiền", "Vietnam", "VN", "Asia/Ho_Chi_Minh", 21.0246, 105.8532, "0930-2200 0930-2130*4 0930-2200*2"],
-    ["Kuala Lumpur - Pavilion", "Malaisie", "MY", "Asia/Kuala_Lumpur", 3.1485, 101.7135, "1000-2200*7"],
-    ["Jakarta - Plaza Indonesia", "Indonésie", "ID", "Asia/Jakarta", -6.1932, 106.8220, "1000-2000*7"],
-    ["Mumbai - Jio World", "Inde", "IN", "Asia/Kolkata", 19.0656, 72.8668, "1100-2200*7"],
-    ["New Delhi - Emporio", "Inde", "IN", "Asia/Kolkata", 28.5434, 77.1568, "1100-2100*7"],
-    ["Manille - Greenbelt 3", "Philippines", "PH", "Asia/Manila", 14.5516, 121.0224, "1100-2000*5 1100-2100*2"],
-    ["Hô Chi Minh-Ville - Union Square", "Vietnam", "VN", "Asia/Ho_Chi_Minh", 10.7762, 106.7018, "1000-2100*7"],
+    // ASIA - SOUTH-EAST & INDIA
+    ["Singapore - ION Orchard", "Singapore", "SG", "Asia/Singapore", 1.3041, 103.8317, "1000-2130*7"],
+    ["Singapore - Marina Bay Sands", "Singapore", "SG", "Asia/Singapore", 1.2837, 103.8594, "1030-2200*5 1030-2300*2"],
+    ["Bangkok - Siam Paragon", "Thailand", "TH", "Asia/Bangkok", 13.7466, 100.5342, "1030-2030*7"],
+    ["Bangkok - Iconsiam", "Thailand", "TH", "Asia/Bangkok", 13.7264, 100.5100, "1030-2000*7"],
+    ["Hanoi - Tràng Tiền", "Vietnam", "VN", "Asia/Ho_Chi_Minh", 21.0246, 105.8532, "0930-2200 0930-2130*4 0930-2200*2"],
+    ["Kuala Lumpur - Pavilion", "Malaysia", "MY", "Asia/Kuala_Lumpur", 3.1485, 101.7135, "1000-2200*7"],
+    ["Jakarta - Plaza Indonesia", "Indonesia", "ID", "Asia/Jakarta", -6.1932, 106.8220, "1000-2000*7"],
+    ["Mumbai - Jio World", "India", "IN", "Asia/Kolkata", 19.0656, 72.8668, "1100-2200*7"],
+    ["New Delhi - Emporio", "India", "IN", "Asia/Kolkata", 28.5434, 77.1568, "1100-2100*7"],
+    ["Manila - Greenbelt 3", "Philippines", "PH", "Asia/Manila", 14.5516, 121.0224, "1100-2000*5 1100-2100*2"],
+    ["Ho Chi Minh City - Union Square", "Vietnam", "VN", "Asia/Ho_Chi_Minh", 10.7762, 106.7018, "1000-2100*7"],
 
-    // MOYEN-ORIENT
-    ["Dubaï - Dubai Mall", "EAU", "AE", "Asia/Dubai", 25.1985, 55.2800, "1000-0 1000-2300*4 1000-0*2"],
-    ["Dubaï - Mall of the Emirates", "EAU", "AE", "Asia/Dubai", 25.1181, 55.2006, "1000-0 1000-2300*4 1000-0*2"],
-    ["Abu Dhabi - The Galleria", "EAU", "AE", "Asia/Dubai", 24.5015, 54.3888, "1000-2200*5 1000-0*2"],
-    ["Riyad - Centria", "Arabie S.", "SA", "Asia/Riyadh", 24.6969, 46.6839, "1000-2230*5 1600-2230 1000-2230"],
-    ["Djeddah - Al Khayyat Center", "Arabie S.", "SA", "Asia/Riyadh", 21.5491, 39.1507, "1000-2230*5 1600-2230 1000-2230"],
+    // MIDDLE EAST & AFRICA
+    ["Dubai - Dubai Mall", "UAE", "AE", "Asia/Dubai", 25.1985, 55.2800, "1000-0 1000-2300*4 1000-0*2"],
+    ["Dubai - Mall of the Emirates", "UAE", "AE", "Asia/Dubai", 25.1181, 55.2006, "1000-0 1000-2300*4 1000-0*2"],
+    ["Abu Dhabi - The Galleria", "UAE", "AE", "Asia/Dubai", 24.5015, 54.3888, "1000-2200*5 1000-0*2"],
+    ["Riyadh - Centria", "Saudi Arabia", "SA", "Asia/Riyadh", 24.6969, 46.6839, "1000-2230*5 1600-2230 1000-2230"],
+    ["Jeddah - Al Khayyat Center", "Saudi Arabia", "SA", "Asia/Riyadh", 21.5491, 39.1507, "1000-2230*5 1600-2230 1000-2230"],
     ["Doha - Place Vendôme", "Qatar", "QA", "Asia/Qatar", 25.4051, 51.5206, "1000-2300*4 1000-0 1000-1130,1300-0 1000-2300"],
-    ["Koweït - Salhiya", "Koweït", "KW", "Asia/Kuwait", 29.3633, 47.9665, "1000-2200*5 1400-2200 1000-2200"],
-    ["Bahreïn - Marassi Galleria", "Bahreïn", "BH", "Asia/Bahrain", 26.3017, 50.6428, "1000-2200*4 1000-0*2 1000-2200"],
-    ["Beyrouth - Aïshti by the Sea", "Liban", "LB", "Asia/Beirut", 33.9119, 35.5804, "1200-1900 1030-1930*6"],
-    ["Casablanca - Place des Nations Unies", "Maroc", "MA", "Africa/Casablanca", 33.5960, -7.6188, "- 1030-1900*6"],
-    ["Johannesburg - Sandton", "Afrique du Sud", "ZA", "Africa/Johannesburg", -26.1089, 28.0505, "0900-1700 0900-1800*6"],
+    ["Kuwait City - Salhiya", "Kuwait", "KW", "Asia/Kuwait", 29.3633, 47.9665, "1000-2200*5 1400-2200 1000-2200"],
+    ["Bahrain - Marassi Galleria", "Bahrain", "BH", "Asia/Bahrain", 26.3017, 50.6428, "1000-2200*4 1000-0*2 1000-2200"],
+    ["Beirut - Aïshti by the Sea", "Lebanon", "LB", "Asia/Beirut", 33.9119, 35.5804, "1200-1900 1030-1930*6"],
+    ["Casablanca - Place des Nations Unies", "Morocco", "MA", "Africa/Casablanca", 33.5960, -7.6188, "- 1030-1900*6"],
+    ["Johannesburg - Sandton", "South Africa", "ZA", "Africa/Johannesburg", -26.1089, 28.0505, "0900-1700 0900-1800*6"],
 
-    // OCÉANIE
-    ["Sydney - Flagship", "Australie", "AU", "Australia/Sydney", -33.8684, 151.2074, "1000-1900 1000-1800*3 1000-2000 1000-1900*2"],
-    ["Melbourne - Collins St", "Australie", "AU", "Australia/Melbourne", -37.8141, 144.9705, "1100-1700 1000-1800*4 1000-1900 1000-1800"],
-    ["Brisbane - Edward St", "Australie", "AU", "Australia/Brisbane", -27.4693, 153.0276, "1030-1700 1000-1800*4 1000-1900 1000-1700"],
-    ["Perth - Murray St", "Australie", "AU", "Australia/Perth", -31.9523, 115.8562, "1100-1700 1000-1800*4 1000-1900 1000-1700"],
-    ["Auckland - Queen St", "Nouvelle-Zélande", "NZ", "Pacific/Auckland", -36.8457, 174.7665, "1000-1800*7"]
+    // OCEANIA
+    ["Sydney - Flagship", "Australia", "AU", "Australia/Sydney", -33.8684, 151.2074, "1000-1900 1000-1800*3 1000-2000 1000-1900*2"],
+    ["Melbourne - Collins St", "Australia", "AU", "Australia/Melbourne", -37.8141, 144.9705, "1100-1700 1000-1800*4 1000-1900 1000-1800"],
+    ["Brisbane - Edward St", "Australia", "AU", "Australia/Brisbane", -27.4693, 153.0276, "1030-1700 1000-1800*4 1000-1900 1000-1700"],
+    ["Perth - Murray St", "Australia", "AU", "Australia/Perth", -31.9523, 115.8562, "1100-1700 1000-1800*4 1000-1900 1000-1700"],
+    ["Auckland - Queen St", "New Zealand", "NZ", "Pacific/Auckland", -36.8457, 174.7665, "1000-1800*7"]
 ];
 
 initMonitor({
@@ -177,13 +177,13 @@ initMonitor({
     closedColor: '#9a9a9a',
     atmosphereColor: '#7d1d26',
     text: {
-        open: 'Ouvert', closed: 'Fermé', holiday: 'Férié',
-        closesIn: 'Ferme dans', opensIn: 'Ouvre dans', dayUnit: 'j',
-        today: "Aujourd'hui", closedToday: "Fermé aujourd'hui",
-        unknown: 'Horaires indisponibles', globeError: 'Globe indisponible',
-        openCount: (o, n) => `${o} / ${n} boutiques ouvertes`,
-        searchPlaceholder: 'Rechercher un pays, une ville, une boutique…',
-        noResults: 'Aucune boutique trouvée'
+        open: 'Open', closed: 'Closed', holiday: 'Holiday',
+        closesIn: 'Closes in', opensIn: 'Opens in', dayUnit: 'd',
+        today: 'Today', closedToday: 'Closed today',
+        unknown: 'Hours unavailable', globeError: 'Globe unavailable',
+        openCount: (o, n) => `${o} / ${n} boutiques open`,
+        searchPlaceholder: 'Search a country, city or boutique…',
+        noResults: 'No boutique found'
     }
 });
 </script>
