@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Boutiques - Global Monitor</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <style>
+        html, body { margin: 0; height: 100%; background: #fff; color: #111; font-family: 'Lato', sans-serif; }
+        body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; box-sizing: border-box; }
+        h1 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 2.2em; letter-spacing: 1px; margin: 0; }
+        .subtitle { font-family: 'Playfair Display', serif; font-style: italic; color: #888; margin: 10px 0 50px; }
+        .brands { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
+        .brand {
+            width: 300px; padding: 45px 30px 35px; box-sizing: border-box;
+            border: 1px solid #e5e5e5; text-decoration: none; color: inherit; text-align: center;
+            border-top: 3px solid var(--c); transition: transform .25s ease, box-shadow .25s ease;
+        }
+        .brand:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
+        .brand .logo { height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 30px; }
+        .brand .logo img { max-height: 48px; max-width: 240px; }
+        .brand .count { font-size: 0.75em; color: #888; letter-spacing: 1.5px; text-transform: uppercase; }
+        .brand .go { margin-top: 18px; font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--c); }
+        footer { margin-top: 60px; color: #aaa; font-size: 0.7em; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+    <h1>Boutiques</h1>
+    <div class="subtitle">Global Monitor</div>
+
+    <div class="brands">
+        <a class="brand" href="boutiquescartier.html" style="--c:#7d1d26">
+            <div class="logo"><img src="logos/cartier.svg" alt="Cartier"></div>
+            <div class="count">Live opening hours worldwide</div>
+            <div class="go">Open monitor &rarr;</div>
+        </a>
+        <a class="brand" href="boutiques-vca.html" style="--c:#111111">
+            <div class="logo"><img src="logos/vca.svg" alt="Van Cleef &amp; Arpels" style="width:240px"></div>
+            <div class="count">Live opening hours worldwide</div>
+            <div class="go">Open monitor &rarr;</div>
+        </a>
+    </div>
+
+    <footer>&copy; Greg u.</footer>
+</body>
+</html>
