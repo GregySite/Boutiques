@@ -273,6 +273,15 @@
             el.addEventListener('mouseenter', () => showTip(c));
             el.addEventListener('mouseleave', () => { $('custom-tooltip').style.display = 'none'; });
             el.addEventListener('click', e => { e.stopPropagation(); onMarkerClick(c); });
+            // La molette au-dessus d'une pastille doit continuer à zoomer le globe
+            el.addEventListener('wheel', e => {
+                e.preventDefault();
+                globe.renderer().domElement.dispatchEvent(new WheelEvent('wheel', {
+                    deltaX: e.deltaX, deltaY: e.deltaY, deltaZ: e.deltaZ, deltaMode: e.deltaMode,
+                    clientX: e.clientX, clientY: e.clientY, ctrlKey: e.ctrlKey, shiftKey: e.shiftKey,
+                    bubbles: true, cancelable: true
+                }));
+            }, { passive: false });
             c.el = el;
             paintMarker(c);
             return el;
