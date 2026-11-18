@@ -394,9 +394,14 @@
                     if (!mat.map) { setTimeout(waitForDayMap, 200); return; }
                     const nightTex = new mat.map.constructor(img);
                     nightTex.colorSpace = mat.map.colorSpace;
+                    nightTex.generateMipmaps = false;  // évite une couture à la longitude 180°
+                    nightTex.minFilter = 1006;         // THREE.LinearFilter
                     nightTex.needsUpdate = true;
                     sunUniform = { value: sunLight.position.clone() };
-                    mat.onBeforeCompile = shader => {
+                    // Les coordonnées de la texture de nuit sont recalculées depuis la normale :
+                    // ça marche aussi bien sur le globe que sur les tuiles satellite.
+                    // gain : éclaircit l'imagerie satellite (plus sombre que la texture du globe)
+                    const nightShader = gain => shader => {
                         shader.uniforms.nightMap = { value: nightTex };
                         shader.uniforms.sunDir = sunUniform;
                         shader.vertexShader = shader.vertexShader
@@ -408,9 +413,14 @@
                                 '#include <common>\nuniform sampler2D nightMap;\nuniform vec3 sunDir;\nvarying vec3 vWorldN;')
                             .replace('#include <dithering_fragment>', [
                                 '#include <dithering_fragment>',
-                                'float sunDot = dot(normalize(vWorldN), normalize(sunDir));',
+                                'gl_FragColor.rgb *= ' + gain.toFixed(2) + ';',
+                                'vec3 wn = normalize(vWorldN);',
+                                'float sunDot = dot(wn, normalize(sunDir));',
                                 'float night = 1.0 - smoothstep(-0.12, 0.12, sunDot);',
-                                'vec3 nTex = texture2D(nightMap, vMapUv).rgb;',
+                                'float latR = asin(clamp(wn.y, -1.0, 1.0));',
+                                'float lngR = 1.5707963 - atan(wn.z, wn.x);',
+                                'vec2 nUv = vec2(fract((lngR + 3.1415927) / 6.2831853), (latR + 1.5707963) / 3.1415927);',
+                                'vec3 nTex = texture2D(nightMap, nUv).rgb;',
                                 // fond de nuit bleuté + lumières des villes renforcées (les zones claires ressortent)
                                 'float city = max(nTex.r - nTex.b * 0.5, 0.0);',
                                 'vec3 nightCol = gl_FragColor.rgb * ' + (cfg.nightDim || 1.8).toFixed(2) +
@@ -418,7 +428,18 @@
                                 'gl_FragColor.rgb = mix(gl_FragColor.rgb, nightCol, night);'
                             ].join('\n'));
                     };
-                    mat.needsUpdate = true;
+                    const patch = (m, gain) => {
+                        if (m.__night) return;
+                        m.__night = true;
+                        m.onBeforeCompile = nightShader(gain);
+                        m.customProgramCacheKey = () => 'night-' + gain;
+                        m.needsUpdate = true;
+                    };
+                    patch(mat, 1);
+                    // Les tuiles satellite sont créées au fil du zoom : on leur applique le même effet
+                    setInterval(() => globe.scene().traverse(o => {
+                        if (o.isMesh && o.material && o.material.isMeshLambertMaterial) patch(o.material, cfg.tileBrightness || 1.6);
+                    }), 300);
                     updateSun();
                 };
                 waitForDayMap();
@@ -427,6 +448,10 @@
         }
 
         // --- GLOBE ---
+        // Imagerie satellite en tuiles (NASA GIBS, domaine public), utilisée seulement en vue rapprochée
+        const TILE_URL = (x, y, l) => 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_NextGeneration/default/GoogleMapsCompatible_Level8/' + l + '/' + y + '/' + x + '.jpeg';
+        const TILES_BELOW = 0.7;
+        let tilesOn = false;
         function initGlobe() {
             const area = $('globe-area');
             const tooltip = $('custom-tooltip');
@@ -437,6 +462,7 @@
                 globe = Globe()(viz)
                     .backgroundColor('#ffffff')
                     .globeImageUrl('https://unpkg.com/three-globe@2.45.6/example/img/earth-blue-marble.jpg')
+                    .globeTileEngineMaxLevel(8)
                     .showAtmosphere(true)
                     .atmosphereColor(cfg.atmosphereColor)
                     .atmosphereAltitude(0.15)
@@ -449,6 +475,9 @@
                     .htmlElementVisibilityModifier((el, visible) => { el.classList.toggle('mk-hidden', !visible); })
                     .onZoom(pov => {
                         recluster();
+                        // En vue rapprochée, on passe sur l'imagerie satellite en tuiles (plus nette)
+                        const wantTiles = pov.altitude < TILES_BELOW;
+                        if (wantTiles !== tilesOn) { tilesOn = wantTiles; globe.globeTileEngineUrl(wantTiles ? TILE_URL : null); }
                         $('globeViz').classList.toggle('show-labels', pov.altitude < 0.7);
                     });
 
@@ -471,6 +500,7 @@
                 area.addEventListener('mouseleave', () => { if (!popupOpen) controls.autoRotate = true; });
                 controls.addEventListener('start', closePopup);
                 recluster(true);
+                $('copyright').textContent += ' · Imagery: NASA GIBS';
                 window.monitorGlobe = globe; // accès console pour le débogage
             } catch (e) {
                 console.error('Globe failed', e);
