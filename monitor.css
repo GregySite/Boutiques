@@ -118,3 +118,47 @@ html, body {
 #custom-tooltip .tt-meta { font-size: 0.8em; color: #888; text-transform: uppercase; margin-bottom: 8px; }
 #custom-tooltip .tt-status { font-weight: bold; font-size: 0.85em; }
 #custom-tooltip .tt-hours { font-size: 0.78em; color: #777; margin-top: 4px; }
+
+/* --- MARQUEURS --- */
+.mk { position: relative; width: 12px; height: 12px; cursor: pointer; pointer-events: auto; transition: opacity .3s; }
+.mk.mk-hidden { opacity: 0; pointer-events: none; }
+.mk-dot {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 10px; height: 10px; border-radius: 50%; box-sizing: border-box;
+    background: var(--closed); border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+    font: 700 10px/1 var(--font-sans); color: #fff; letter-spacing: 0; white-space: nowrap;
+    transition: transform .2s;
+}
+.mk:hover .mk-dot { transform: translate(-50%, -50%) scale(1.35); }
+.mk-open .mk-dot { background: var(--brand); }
+.mk-open .mk-dot::after {
+    content: ''; position: absolute; inset: -6px; border-radius: 50%;
+    border: 2px solid var(--brand); opacity: 0; animation: mk-pulse 2.4s ease-out infinite;
+}
+@keyframes mk-pulse { 0% { transform: scale(0.5); opacity: 0.7; } 100% { transform: scale(1.6); opacity: 0; } }
+.mk-cluster .mk-dot { width: auto; min-width: 30px; height: 22px; padding: 0 6px; border-radius: 11px; }
+.mk-cluster .mk-dot::after { border-radius: 14px; }
+.mk-active .mk-dot { box-shadow: 0 0 0 3px rgba(255,255,255,0.9), 0 0 0 5px var(--brand), 0 1px 6px rgba(0,0,0,0.5); }
+.mk-label {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    white-space: nowrap; font: 600 11px var(--font-sans); color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9);
+    opacity: 0; transition: opacity .3s; pointer-events: none;
+}
+.mk-cluster .mk-label { left: 22px; }
+.show-labels .mk-label { opacity: 1; }
+
+#custom-tooltip .tt-row { font-size: 0.82em; margin-top: 4px; white-space: nowrap; }
+
+#cluster-pop {
+    position: absolute; z-index: 120; background: #fff; min-width: 220px;
+    border-left: 3px solid var(--brand); box-shadow: 0 10px 30px rgba(0,0,0,0.18); padding: 6px 0;
+}
+.cp-row { display: flex; align-items: center; gap: 10px; padding: 8px 16px; cursor: pointer; font-size: 0.85em; }
+.cp-row:hover { background: #f6f6f6; }
+.cp-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--closed); flex: none; }
+.cp-open .cp-dot { background: var(--brand); }
+.cp-name { flex: 1; font-family: var(--font-serif); color: #000; }
+.cp-time { color: #888; font-size: 0.9em; }

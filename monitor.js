@@ -165,7 +165,7 @@
             let n = 0;
             shops.forEach(s => { const ok = matches(s); s.el.style.display = ok ? '' : 'none'; if (ok) n++; });
             noResults.style.display = n ? 'none' : 'block';
-            if (globe) globe.pointsData(shops.filter(matches));
+            recluster(true);
             updateCount();
         }
 
@@ -208,7 +208,7 @@
                 b.className = 'badge ' + (st.open ? 'b-open' : 'b-closed');
             });
             updateCount();
-            if (globe) globe.pointColor(d => d.st.open ? cfg.brandColor : cfg.closedColor);
+            paintMarkers();
         }
 
         function activateShop(id) {
@@ -217,11 +217,150 @@
             const shop = shops.find(s => s.id === id);
             if (!shop) return;
             shop.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            closePopup();
+            paintMarkers();
             if (globe) {
                 globe.controls().autoRotate = false;
-                globe.pointOfView({ lat: shop.lat, lng: shop.lng, altitude: 1.5 }, 1500);
+                globe.pointOfView({ lat: shop.lat, lng: shop.lng, altitude: 0.9 }, 1500);
             }
         }
+
+        // --- MARQUEURS (pastilles à taille fixe + regroupement) ---
+        // Les boutiques trop proches à l'écran (< CLUSTER_PX) sont fusionnées en une pastille « ouvertes/total ».
+        const CLUSTER_PX = 26, EARTH_KM = 6371;
+        let clusterKey = '', clusterCache = new Map(), currentClusters = [], popupOpen = false;
+
+        const kmPerPx = alt => 2 * Math.tan(25 * Math.PI / 180) * alt * EARTH_KM / (($('globe-area').clientHeight) || 800);
+        function km(a, b) {
+            const t = Math.PI / 180, dLat = (b.lat - a.lat) * t, dLng = (b.lng - a.lng) * t;
+            const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * t) * Math.cos(b.lat * t) * Math.sin(dLng / 2) ** 2;
+            return 2 * EARTH_KM * Math.asin(Math.sqrt(h));
+        }
+
+        function recluster(force) {
+            if (!globe) return;
+            const thr = CLUSTER_PX * kmPerPx(globe.pointOfView().altitude);
+            const groups = [];
+            shops.filter(matches).forEach(s => {
+                const g = groups.find(g => km(g, s) < thr);
+                if (g) {
+                    g.members.push(s);
+                    g.lat = g.members.reduce((t, m) => t + m.lat, 0) / g.members.length;
+                    g.lng = g.members.reduce((t, m) => t + m.lng, 0) / g.members.length;
+                } else groups.push({ lat: s.lat, lng: s.lng, members: [s] });
+            });
+            const key = groups.map(g => g.members.map(m => m.id).sort((a, b) => a - b).join(',')).sort().join('|');
+            if (key === clusterKey && !force) return;
+            clusterKey = key;
+            const next = new Map();
+            currentClusters = groups.map(g => {
+                const k = g.members.map(m => m.id).sort((a, b) => a - b).join(',');
+                const c = clusterCache.get(k) || { k, members: g.members };
+                c.lat = g.lat; c.lng = g.lng; c.members = g.members;
+                next.set(k, c);
+                return c;
+            });
+            clusterCache = next;
+            globe.htmlElementsData(currentClusters);
+            paintMarkers();
+        }
+
+        function markerEl(c) {
+            if (c.el) return c.el;
+            const el = document.createElement('div');
+            el.className = 'mk';
+            el.innerHTML = '<span class="mk-dot"></span><span class="mk-label"></span>';
+            el.addEventListener('mouseenter', () => showTip(c));
+            el.addEventListener('mouseleave', () => { $('custom-tooltip').style.display = 'none'; });
+            el.addEventListener('click', e => { e.stopPropagation(); onMarkerClick(c); });
+            c.el = el;
+            paintMarker(c);
+            return el;
+        }
+
+        function paintMarker(c) {
+            if (!c.el) return;
+            const n = c.members.length, open = c.members.filter(m => m.st && m.st.open).length;
+            c.el.classList.toggle('mk-cluster', n > 1);
+            c.el.classList.toggle('mk-open', open > 0);
+            c.el.classList.toggle('mk-active', c.members.some(m => m.id === activeId));
+            c.el.querySelector('.mk-dot').textContent = n > 1 ? open + '/' + n : '';
+            c.el.querySelector('.mk-label').textContent = n > 1 ? c.members[0].name.split(' - ')[0] : c.members[0].name;
+        }
+        function paintMarkers() { currentClusters.forEach(paintMarker); }
+
+        function showTip(c) {
+            const tooltip = $('custom-tooltip'), area = $('globe-area');
+            if (popupOpen) return;
+            tooltip.innerHTML = '';
+            const add = (tag, cls, text, color) => {
+                const e = document.createElement(tag);
+                if (cls) e.className = cls;
+                e.textContent = text;
+                if (color) e.style.color = color;
+                tooltip.appendChild(e);
+            };
+            if (c.members.length === 1) {
+                const d = c.members[0], st = d.st, tx = statusTexts(st);
+                add('div', 'tt-meta', d.country);
+                add('h3', '', d.name);
+                add('div', 'tt-status', tx.badge + ' - ' + st.time, st.open ? cfg.brandColor : cfg.closedColor);
+                add('div', 'tt-hours', st.todayHours ? T.today + ' : ' + st.todayHours : T.closedToday);
+            } else {
+                add('div', 'tt-meta', c.members.length + ' boutiques');
+                c.members.forEach(m => add('div', 'tt-row', (m.st.open ? '● ' : '○ ') + m.name + '  ' + m.st.time, m.st.open ? cfg.brandColor : cfg.closedColor));
+            }
+            tooltip.style.display = 'block';
+            const r = area.getBoundingClientRect(), b = c.el.getBoundingClientRect();
+            let x = b.right - r.left + 12, y = b.top - r.top - 6;
+            x = Math.max(0, Math.min(x, r.width - tooltip.offsetWidth - 10));
+            y = Math.max(0, Math.min(y, r.height - tooltip.offsetHeight - 10));
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+        }
+
+        function onMarkerClick(c) {
+            $('custom-tooltip').style.display = 'none';
+            if (c.members.length === 1) { activateShop(c.members[0].id); return; }
+            // Altitude à laquelle les membres du groupe se séparent
+            let minKm = Infinity;
+            c.members.forEach((a, i) => c.members.slice(i + 1).forEach(b => { minKm = Math.min(minKm, km(a, b)); }));
+            const altNeeded = minKm / (CLUSTER_PX * kmPerPx(1)) * 0.8;
+            globe.controls().autoRotate = false;
+            if (altNeeded >= 0.04) {
+                globe.pointOfView({ lat: c.lat, lng: c.lng, altitude: Math.min(altNeeded, globe.pointOfView().altitude * 0.6) }, 1200);
+            } else {
+                openPopup(c); // trop proches pour être séparées : liste cliquable
+            }
+        }
+
+        function openPopup(c) {
+            closePopup();
+            const pop = document.createElement('div');
+            pop.id = 'cluster-pop';
+            c.members.forEach(m => {
+                const row = document.createElement('div');
+                row.className = 'cp-row' + (m.st.open ? ' cp-open' : '');
+                row.innerHTML = '<span class="cp-dot"></span><span class="cp-name"></span><span class="cp-time"></span>';
+                row.querySelector('.cp-name').textContent = m.name;
+                row.querySelector('.cp-time').textContent = m.st.time;
+                row.addEventListener('click', () => activateShop(m.id));
+                pop.appendChild(row);
+            });
+            const area = $('globe-area');
+            area.appendChild(pop);
+            const r = area.getBoundingClientRect(), b = c.el.getBoundingClientRect();
+            pop.style.left = Math.max(0, Math.min(b.right - r.left + 10, r.width - pop.offsetWidth - 10)) + 'px';
+            pop.style.top = Math.max(0, Math.min(b.top - r.top - 10, r.height - pop.offsetHeight - 10)) + 'px';
+            popupOpen = true;
+        }
+        function closePopup() {
+            const pop = $('cluster-pop');
+            if (pop) pop.remove();
+            popupOpen = false;
+        }
+        document.addEventListener('mousedown', e => { if (popupOpen && !e.target.closest('#cluster-pop')) closePopup(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closePopup(); });
 
         // --- HORLOGE UTC ---
         function updateClock() {
@@ -294,17 +433,6 @@
             const viz = $('globeViz');
             $('loading-msg').style.display = 'none';
 
-            let lastMouse = null;
-            function placeTooltip() {
-                if (!lastMouse || tooltip.style.display !== 'block') return;
-                const r = area.getBoundingClientRect();
-                let x = lastMouse.x - r.left + 15, y = lastMouse.y - r.top + 15;
-                x = Math.max(0, Math.min(x, r.width - tooltip.offsetWidth - 10));
-                y = Math.max(0, Math.min(y, r.height - tooltip.offsetHeight - 10));
-                tooltip.style.left = x + 'px';
-                tooltip.style.top = y + 'px';
-            }
-
             try {
                 globe = Globe()(viz)
                     .backgroundColor('#ffffff')
@@ -314,28 +442,14 @@
                     .atmosphereAltitude(0.15)
                     .width(area.clientWidth)
                     .height(area.clientHeight)
-                    .pointsData(shops)
-                    .pointLat('lat').pointLng('lng')
-                    .pointColor(d => d.st.open ? cfg.brandColor : cfg.closedColor)
-                    .pointAltitude(0.03)
-                    .pointRadius(0.7)
-                    .pointsMerge(false)
-                    .pointLabel(null)
-                    .onPointClick(d => activateShop(d.id))
-                    .onPointHover(d => {
-                        viz.style.cursor = d ? 'pointer' : 'default';
-                        if (!d) { tooltip.style.display = 'none'; return; }
-                        const st = d.st, tx = statusTexts(st);
-                        tooltip.innerHTML = `<div class="tt-meta"></div><h3></h3><div class="tt-status"></div><div class="tt-hours"></div>`;
-                        tooltip.querySelector('.tt-meta').textContent = d.country;
-                        tooltip.querySelector('h3').textContent = d.name;
-                        const ts = tooltip.querySelector('.tt-status');
-                        ts.textContent = `${tx.badge} - ${st.time}`;
-                        ts.style.color = st.open ? cfg.brandColor : cfg.closedColor;
-                        tooltip.querySelector('.tt-hours').textContent =
-                            st.todayHours ? `${T.today} : ${st.todayHours}` : T.closedToday;
-                        tooltip.style.display = 'block';
-                        placeTooltip();
+                    .htmlElementsData([])
+                    .htmlLat('lat').htmlLng('lng').htmlAltitude(0.005)
+                    .htmlElement(markerEl)
+                    .htmlTransitionDuration(0)
+                    .htmlElementVisibilityModifier((el, visible) => { el.classList.toggle('mk-hidden', !visible); })
+                    .onZoom(pov => {
+                        recluster();
+                        $('globeViz').classList.toggle('show-labels', pov.altitude < 0.7);
                     });
 
                 // Lumières : on réutilise celles de globe.gl (pas besoin de charger three.js à part)
@@ -353,14 +467,11 @@
                 const controls = globe.controls();
                 controls.autoRotate = true;
                 controls.autoRotateSpeed = 0.5;
-                viz.addEventListener('mouseenter', () => { controls.autoRotate = false; });
-                viz.addEventListener('mouseleave', () => { controls.autoRotate = true; });
-
-                // Infobulle qui suit la souris (coordonnées relatives à la zone du globe)
-                viz.addEventListener('mousemove', e => {
-                    lastMouse = { x: e.clientX, y: e.clientY };
-                    placeTooltip();
-                });
+                area.addEventListener('mouseenter', () => { controls.autoRotate = false; });
+                area.addEventListener('mouseleave', () => { if (!popupOpen) controls.autoRotate = true; });
+                controls.addEventListener('start', closePopup);
+                recluster(true);
+                window.monitorGlobe = globe; // accès console pour le débogage
             } catch (e) {
                 console.error('Globe failed', e);
                 $('loading-msg').style.display = 'block';
@@ -378,6 +489,7 @@
             if (!globe) return;
             const c = $('globe-area');
             globe.width(c.clientWidth).height(c.clientHeight);
+            recluster();
         });
 
         window.activateShop = activateShop;
