@@ -327,8 +327,8 @@
             c.members.forEach((a, i) => c.members.slice(i + 1).forEach(b => { minKm = Math.min(minKm, km(a, b)); }));
             const altNeeded = minKm / (CLUSTER_PX * kmPerPx(1)) * 0.8;
             globe.controls().autoRotate = false;
-            if (altNeeded >= 0.04) {
-                globe.pointOfView({ lat: c.lat, lng: c.lng, altitude: Math.min(altNeeded, globe.pointOfView().altitude * 0.6) }, 1200);
+            if (altNeeded >= MIN_ALT) {
+                globe.pointOfView({ lat: c.lat, lng: c.lng, altitude: Math.max(MIN_ALT, Math.min(altNeeded, globe.pointOfView().altitude * 0.6)) }, 1200);
             } else {
                 openPopup(c); // trop proches pour être séparées : liste cliquable
             }
@@ -451,6 +451,7 @@
         // Imagerie satellite en tuiles (NASA GIBS, domaine public), utilisée seulement en vue rapprochée
         const TILE_URL = (x, y, l) => 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_NextGeneration/default/GoogleMapsCompatible_Level8/' + l + '/' + y + '/' + x + '.jpeg';
         const TILES_BELOW = 0.7;
+        const MIN_ALT = 0.12, MAX_ALT = 3.2; // altitude en rayons terrestres (vue par défaut : 2.5)
         let tilesOn = false;
         function initGlobe() {
             const area = $('globe-area');
@@ -496,6 +497,9 @@
                 const controls = globe.controls();
                 controls.autoRotate = true;
                 controls.autoRotateSpeed = 0.5;
+                // Limites du zoom : ni trop près (l'imagerie devient floue), ni trop loin
+                controls.minDistance = 100 * (1 + MIN_ALT);
+                controls.maxDistance = 100 * (1 + MAX_ALT);
                 area.addEventListener('mouseenter', () => { controls.autoRotate = false; });
                 area.addEventListener('mouseleave', () => { if (!popupOpen) controls.autoRotate = true; });
                 controls.addEventListener('start', closePopup);
